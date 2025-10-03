@@ -1,0 +1,340 @@
+{
+  "caregiver": {
+    "incentives": {
+      "sectionTitle": "Why Become a Caregiver?",
+      "parentHeaders": [
+        {
+          "id": "financial-benefits",
+          "title": "Financial Benefits",
+          "childHeaders": [
+            {
+              "id": "competitive-rates",
+              "title": "Competitive Hourly Rates",
+              "content": "<p>Caregivers can expect competitive compensation that reflects their skills and experience. Entry-level positions typically start at $15-18 per hour, with opportunities for increased pay based on certifications, specializations, and years of experience. Many agencies also offer performance-based bonuses and overtime pay.</p>",
+              "sources": "Bureau of Labor Statistics, Home Care Industry Reports",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "health-insurance",
+              "title": "Health Insurance Benefits",
+              "content": "<p>Full-time caregivers often receive comprehensive health insurance packages that include medical, dental, and vision coverage. Many employers also offer flexible spending accounts (FSAs) and health savings accounts (HSAs) to help manage healthcare costs.</p>",
+              "sources": "Healthcare Industry Benefits Survey, Caregiver Employment Studies",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "paid-time-off",
+              "title": "Paid Time Off",
+              "content": "<p>Caregivers typically receive paid vacation days, sick leave, and holiday pay. The amount of PTO often increases with tenure, and some employers offer additional personal days for professional development or mental health.</p>",
+              "sources": "Employee Benefits Research Institute, Home Care Association Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "retirement-plans",
+              "title": "Retirement Plans",
+              "content": "<p>Many employers offer 401(k) plans with company matching contributions. Some organizations also provide pension plans or other retirement savings options to help caregivers plan for their future.</p>",
+              "sources": "Department of Labor Retirement Security Guidelines, Financial Planning Association",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "career-advancement",
+              "title": "Career Advancement Opportunities",
+              "content": "<p>The caregiving field offers numerous paths for career growth, including specialized certifications, leadership roles, and opportunities to transition into healthcare administration or nursing.</p>",
+              "sources": "National Association for Home Care & Hospice, Healthcare Career Development Studies",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "February 12, 2025"
+        },
+        {
+          "id": "personal-growth",
+          "title": "Personal Growth",
+          "childHeaders": [
+            {
+              "id": "healthcare-skills",
+              "title": "Healthcare Skills Development",
+              "content": "<p>Caregiving provides hands-on experience in essential healthcare skills, including:</p><ul><li>Vital signs monitoring</li><li>Basic medical terminology</li><li>First aid and emergency response</li><li>Medication management</li><li>Infection control practices</li></ul>",
+              "sources": "American Red Cross Training Materials, Healthcare Skills Assessment Studies",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "meaningful-relationships",
+              "title": "Building Meaningful Relationships",
+              "content": "<p>Develop deep connections with care recipients and their families through:</p><ul><li>Active listening skills</li><li>Emotional support techniques</li><li>Cultural competency</li><li>Family dynamics understanding</li></ul>",
+              "sources": "Psychology of Caregiving Research, Family Dynamics in Healthcare Studies",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "professional-development",
+              "title": "Professional Development",
+              "content": "<p>Advance your career through various opportunities:</p><ul><li>Certification programs</li><li>Specialized training workshops</li><li>Leadership development</li><li>Networking events</li></ul>",
+              "sources": "Continuing Education Council, Professional Development Institute",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "January 15, 2025"
+        },
+        {
+          "id": "social-impact",
+          "title": "Social Impact",
+          "childHeaders": [
+            {
+              "id": "community-integration",
+              "title": "Community Integration",
+              "content": "<h3>Community Integration</h3><p>Caregivers play a vital role in helping care recipients maintain active participation in their communities. This includes:</p><ul><li>Facilitating attendance at community events</li><li>Supporting social connections</li><li>Enabling participation in local activities</li><li>Creating opportunities for meaningful engagement</li></ul>",
+              "sources": "Community Health Research, Social Work Practice Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "cultural-enrichment",
+              "title": "Diversity and Cultural Enrichment",
+              "content": "<h3>Exposure to Diverse Populations</h3><p>Working as a caregiver provides opportunities for cultural enrichment through:</p><ul><li>Interaction with people from various backgrounds</li><li>Learning about different traditions and customs</li><li>Developing cross-cultural communication skills</li><li>Gaining perspective on diverse life experiences</li></ul>",
+              "sources": "Cultural Competency in Healthcare, Diversity Training Institute",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "January 8, 2025"
+        }
+      ]
+    },
+    "levels": {
+      "sectionTitle": "Care Levels",
+      "parentHeaders": [
+        {
+          "id": "companion-care",
+          "title": "Level 1: Companion Care",
+          "childHeaders": [
+            {
+              "id": "companion-services",
+              "title": "Services Included",
+              "content": "<p>Companion care provides social interaction and basic assistance for seniors who are generally healthy and independent. Services include:</p><ul><li>Conversation and companionship</li><li>Meal preparation and light housekeeping</li><li>Running errands and accompanying to appointments</li><li>Medication reminders</li></ul>",
+              "sources": "Home Care Association Standards, Companion Care Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "companion-ideal",
+              "title": "Ideal For",
+              "content": "<p>This level is ideal for individuals who live alone and need social engagement or minimal help with daily activities to remain safe and comfortable at home.</p>",
+              "sources": "Aging in Place Research, Senior Care Assessment Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "March 1, 2025"
+        },
+        {
+          "id": "personal-care",
+          "title": "Level 2: Personal Care Assistance (PCA)",
+          "childHeaders": [
+            {
+              "id": "pca-services",
+              "title": "Services Included",
+              "content": "<p>Personal care includes all services from companion care, plus hands-on assistance with activities of daily living (ADLs). Services include:</p><ul><li>Bathing, dressing, and grooming assistance</li><li>Mobility and transfer support</li><li>Toileting and incontinence care</li><li>More detailed meal planning and preparation</li></ul>",
+              "sources": "Activities of Daily Living Standards, Personal Care Certification Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "pca-ideal",
+              "title": "Ideal For",
+              "content": "<p>This level is for individuals who have chronic health conditions, mobility challenges, or cognitive decline that requires direct physical assistance.</p>",
+              "sources": "Chronic Care Management Studies, Mobility Assessment Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "March 1, 2025"
+        }
+      ]
+    },
+    "becoming": {
+      "sectionTitle": "Finding Caregiver Opportunities",
+      "parentHeaders": [
+        {
+          "id": "getting-started",
+          "title": "How to Get Started",
+          "childHeaders": [
+            {
+              "id": "get-certified",
+              "title": "Step 1: Get Certified",
+              "content": "<p>Most states and agencies require basic certifications like First Aid, CPR, and sometimes a Certified Nursing Assistant (CNA) or Home Health Aide (HHA) license. These courses provide essential skills and increase your hiring potential.</p>",
+              "sources": "State Licensing Boards, American Red Cross Certification Programs",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "build-resume",
+              "title": "Step 2: Build Your Resume",
+              "content": "<p>Highlight any experience in healthcare, volunteering, or personal caregiving. Emphasize soft skills like compassion, patience, communication, and reliability.</p>",
+              "sources": "Career Development Resources, Healthcare HR Guidelines",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "find-jobs",
+              "title": "Step 3: Find Job Openings",
+              "content": "<p>Look for opportunities through online job boards, local agency websites, community centers, and referrals. Networking with other healthcare professionals can also lead to job opportunities.</p>",
+              "sources": "Job Search Best Practices, Healthcare Employment Networks",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "February 20, 2025"
+        }
+      ]
+    },
+    "resources": {
+      "sectionTitle": "Caregiver Resources",
+      "parentHeaders": [
+        {
+          "id": "professional-orgs",
+          "title": "Professional Organizations",
+          "childHeaders": [
+            {
+              "id": "family-caregiver-alliance",
+              "title": "Family Caregiver Alliance (FCA)",
+              "content": "<p>The FCA provides services, education, and advocacy for caregivers. They offer a wealth of information on their website, including statistics, reports, and a national center on caregiving.</p>",
+              "sources": "Family Caregiver Alliance Official Website, Caregiver Resource Directory",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "national-alliance-caregiving",
+              "title": "National Alliance for Caregiving",
+              "content": "<p>A non-profit coalition dedicated to improving quality of life for caregivers through research, innovation, and advocacy. They conduct policy analysis and provide resources for professionals.</p>",
+              "sources": "National Alliance for Caregiving Research Reports, Advocacy Documentation",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "January 30, 2025"
+        }
+      ]
+    }
+  },
+  "carerecipient": {
+    "incentives": {
+      "sectionTitle": "Benefits of In-Home Care",
+      "parentHeaders": [
+        {
+          "id": "rc-independence",
+          "title": "Maintaining Independence",
+          "childHeaders": [
+            {
+              "id": "rc-stay-home",
+              "title": "Stay in Your Own Home",
+              "content": "<p>Receive personalized care in the comfort and familiarity of your own home, surrounded by your memories and belongings. In-home care helps you maintain your daily routines and sense of normalcy.</p>",
+              "sources": "Aging in Place Research, Home Care Benefits Studies",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "rc-personalized-care",
+              "title": "Personalized One-on-One Attention",
+              "content": "<p>Unlike residential facilities, in-home care provides a caregiver dedicated solely to your needs, ensuring you receive focused, one-on-one support tailored to your preferences.</p>",
+              "sources": "Personalized Care Research, Home vs Facility Care Comparison Studies",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "July 10, 2025"
+        },
+        {
+          "id": "rc-health-wellbeing",
+          "title": "Health and Well-being",
+          "childHeaders": [
+            {
+              "id": "rc-custom-care-plans",
+              "title": "Customized Care Plans",
+              "content": "<p>Your care plan is designed around your specific health needs, from medication reminders and mobility assistance to meal preparation that meets your dietary requirements.</p>",
+              "sources": "Care Plan Development Guidelines, Personalized Healthcare Standards",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            },
+            {
+              "id": "rc-family-peace-of-mind",
+              "title": "Peace of Mind for Family",
+              "content": "<p>Your loved ones can rest assured knowing you are safe and well-cared for by a professional, compassionate caregiver, reducing stress for everyone involved.</p>",
+              "sources": "Family Caregiver Stress Studies, Peace of Mind Research",
+              "last_updated": "2025-08-18T14:24:36-05:00"
+            }
+          ],
+          "lastUpdated": "July 10, 2025"
+        }
+      ]
+    },
+    "levels": {
+      "sectionTitle": "Understanding Care Options",
+      "parentHeaders": [
+        {
+          "id": "rc-companion-care",
+          "title": "Companion Care",
+          "childHeaders": [
+            {
+              "id": "rc-companion-services",
+              "title": "What It Is",
+              "content": "<p>Ideal for seniors who live alone and need social interaction or light assistance. A companion can help with errands, meal prep, and provide engaging conversation to prevent loneliness.</p>",
+              "sources": "<a href='https://www.aging.com/companion-care-services/'>Aging.com Companion Care Guide</a>, Senior Care Research Institute",
+              "last_updated": "2025-08-18T14:28:42-05:00"
+            }
+          ],
+          "lastUpdated": "July 10, 2025"
+        },
+        {
+          "id": "rc-personal-care",
+          "title": "Personal Care Assistance",
+          "childHeaders": [
+            {
+              "id": "rc-pca-services",
+              "title": "What It Is",
+              "content": "<p>For those needing hands-on help with daily activities like bathing, dressing, and mobility. Personal care assistants provide the support needed to live safely at home despite physical challenges.</p>",
+              "sources": "<a href='https://www.medicare.gov/coverage/personal-care-services'>Medicare Personal Care Coverage</a>, Activities of Daily Living Standards",
+              "last_updated": "2025-08-18T14:28:42-05:00"
+            }
+          ],
+          "lastUpdated": "July 10, 2025"
+        }
+      ]
+    },
+    "findingcare": {
+      "sectionTitle": "Finding the Right Care",
+      "parentHeaders": [
+        {
+          "id": "rc-finding-care-steps",
+          "title": "Steps to Finding Care",
+          "childHeaders": [
+            {
+              "id": "rc-assess-needs",
+              "title": "Step 1: Assess Your Needs",
+              "content": "<p>Work with your family and healthcare provider to determine the level of care you need. Consider your medical conditions, mobility, and daily support requirements.</p>",
+              "sources": "<a href='https://www.caregiving.org/resources/care-planning/'>National Alliance for Caregiving - Care Planning</a>, Healthcare Assessment Guidelines",
+              "last_updated": "2025-08-18T14:28:42-05:00"
+            },
+            {
+              "id": "rc-find-provider",
+              "title": "Step 2: Find a Provider",
+              "content": "<p>Research local home care agencies. Check their reviews, certifications, and services offered. Ask for recommendations from friends, family, or your doctor.</p>",
+              "sources": "<a href='https://www.medicare.gov/care-compare/'>Medicare Care Compare</a>, Provider Selection Best Practices",
+              "last_updated": "2025-08-18T14:28:42-05:00"
+            }
+          ],
+          "lastUpdated": "July 10, 2025"
+        }
+      ]
+    },
+    "resources": {
+      "sectionTitle": "Helpful Resources",
+      "parentHeaders": [
+        {
+          "id": "rc-aging-resources",
+          "title": "Aging and Disability Resources",
+          "childHeaders": [
+            {
+              "id": "rc-area-agency-aging",
+              "title": "Area Agency on Aging (AAA)",
+              "content": "<p>Your local AAA is a one-stop shop for information on services for older adults and their families. They can connect you with transportation, meal delivery, and other local programs.</p>",
+              "sources": "<a href='https://www.n4a.org/'>National Association of Area Agencies on Aging</a>, Local AAA Directory",
+              "last_updated": "2025-08-18T14:28:42-05:00"
+            },
+            {
+              "id": "rc-medicare-gov",
+              "title": "Medicare.gov",
+              "content": "<p>The official U.S. government site for Medicare, providing information about coverage, finding providers, and managing costs.</p>",
+              "sources": "<a href='https://www.medicare.gov/'>Medicare.gov Official Site</a>, CMS Documentation",
+              "last_updated": "2025-08-18T14:28:42-05:00"
+            }
+          ],
+          "lastUpdated": "July 10, 2025"
+        }
+      ]
+    }
+  }
+}

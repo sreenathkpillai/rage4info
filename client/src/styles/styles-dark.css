@@ -1,0 +1,378 @@
+/* Dark theme styles */
+:root {
+    --dark-bg: #000000;
+    --darker-bg: #121212;
+    --lighter-bg: #2a2a2a;
+    --soft-white: #333333;  /* New color for replacing white backgrounds */
+    --highlight-gray: #4a4a4a;  /* Made lighter for more contrast */
+    --primary-blue: #26b6ca;
+    --accent-yellow: #fcd451;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --border-color: #404040;
+}
+
+/* Role Navigation - Dark Theme */
+body.dark-theme .role-navigation {
+    background-color: var(--darker-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-theme .role-link {
+    color: var(--text-secondary);
+}
+
+body.dark-theme .role-link:hover {
+    color: var(--text-primary);
+    background-color: var(--highlight-gray);
+}
+
+body.dark-theme .role-link.active {
+    background-color: var(--primary-blue);
+    color: var(--text-primary);
+}
+
+/* Base styles */
+body.dark-theme {
+    background-color: var(--dark-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Header styling */
+body.dark-theme .caregiver-header {
+    background: linear-gradient(135deg, var(--darker-bg), #000000);
+    border-bottom: 3px solid var(--primary-blue);
+}
+
+body.dark-theme .caregiver-header h1 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .info-header-container h1,
+body.dark-theme .info-header-container p {
+    color: var(--text-primary);
+}
+
+body.dark-theme .back-button {
+    color: var(--text-primary);
+    background-color: var(--soft-white) !important;
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+body.dark-theme .back-button:hover {
+    background-color: var(--primary-blue);
+    color: var(--text-primary);
+}
+
+/* Main content area */
+body.dark-theme .info-container {
+    background-color: var(--dark-bg) !important;
+}
+
+/* Tab container */
+body.dark-theme .tab-navigation {
+    background-color: var(--dark-bg) !important;
+    padding: 10px;
+}
+
+/* Tab buttons container */
+body.dark-theme .tab-container {
+    background-color: var(--dark-bg) !important;
+}
+
+/* Tab navigation */
+body.dark-theme .tab-button {
+    background-color: var(--soft-white);
+    color: var(--darker-bg);
+    border: 1px solid var(--soft-white);
+    font-weight: 500;
+}
+
+body.dark-theme .tab-button:hover {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: var(--text-primary);
+}
+
+body.dark-theme .tab-button.active {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: var(--text-primary);
+}
+
+/* Expandable sections container */
+body.dark-theme .info-section {
+    background-color: var(--dark-bg) !important;
+    padding: 20px;
+}
+
+/* Expandable headers */
+body.dark-theme .expandable-header,
+body.dark-theme .expandable-list-header {
+    background-color: var(--soft-white) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid transparent !important; 
+    transition: all 0.3s ease !important;
+}
+
+body.dark-theme .expandable-header {
+    border-left: 4px solid var(--accent-yellow) !important;
+}
+
+body.dark-theme .expandable-header span,
+body.dark-theme .expandable-list-header span,
+body.dark-theme .expandable-header h3,
+body.dark-theme .expandable-list-header h3 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .expandable-header:hover,
+body.dark-theme .expandable-list-header:hover {
+    background-color: var(--highlight-gray) !important;
+    border: 2px solid var(--primary-blue) !important; 
+}
+
+body.dark-theme .expandable-content,
+body.dark-theme .expandable-list-content {
+    background-color: var(--darker-bg) !important;
+    color: var(--text-primary) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+body.dark-theme .expandable-content p,
+body.dark-theme .expandable-content ul li,
+body.dark-theme .expandable-content a,
+body.dark-theme .expandable-list-content p,
+body.dark-theme .expandable-list-content ul li,
+body.dark-theme .expandable-list-content a {
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .expandable-list-item {
+    border: 1px solid var(--border-color) !important;
+    background-color: var(--darker-bg) !important;
+    margin-bottom: 10px;
+}
+
+body.dark-theme .expandable-list-header {
+    border-left: 4px solid var(--primary-blue) !important;
+}
+
+/* Expandable sections */
+body.dark-theme .expandable-content {
+    background-color: var(--darker-bg) !important;
+    color: var(--text-primary) !important;
+    overflow: visible;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+body.dark-theme .expandable-content.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Nested expandable sections */
+body.dark-theme .expandable-list-content {
+    display: none;
+    padding: 15px;
+    background-color: var(--darker-bg) !important;
+    border-radius: 0;
+    margin: 0;
+    overflow: visible;
+    color: var(--text-primary) !important;
+    border: none;
+}
+
+body.dark-theme .expandable-list-content.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+body.dark-theme .expandable-list-header {
+    background-color: var(--soft-white) !important;
+    color: var(--text-primary) !important;
+    padding: 12px 15px;
+    border-radius: 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    border: none;
+    transition: all 0.3s;
+}
+
+body.dark-theme .expandable-list-header:hover {
+    background-color: var(--highlight-gray) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .expandable-list-item {
+    margin: 0;
+    background-color: var(--darker-bg);
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-theme .expandable-list-item:last-child {
+    border-bottom: none;
+}
+
+/* Personal Growth section specific styles 
+.personal-growth-header,
+.personal-growth-content .expandable-list-header {
+    background-color: var(--soft-white) !important;
+    color: var(--text-primary) !important;
+}
+
+.personal-growth-header:hover,
+.personal-growth-content .expandable-list-header:hover {
+    background-color: var(--primary-blue) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Make sure icons in Personal Growth section stay white on hover 
+.personal-growth-header:hover i,
+.personal-growth-content .expandable-list-header:hover i {
+    color: var(--text-primary) !important;
+}*/
+
+/* Action buttons container */
+body.dark-theme .action-buttons {
+    background-color: var(--dark-bg) !important;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+body.dark-theme .action-button {
+    background-color: var(--soft-white) !important;
+    border: 1px solid var(--soft-white) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .action-button:hover {
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .action-button i {
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .action-button:hover i {
+    color: var(--text-primary) !important;
+}
+
+/* Info links */
+body.dark-theme .info-link {
+    color: var(--primary-blue) !important;
+}
+
+body.dark-theme .info-link:hover {
+    color: var(--accent-yellow) !important;
+}
+
+/* Lists */
+body.dark-theme .info-list {
+    background-color: var(--dark-bg) !important;
+    padding: 15px 30px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+body.dark-theme .info-list li {
+    color: var(--text-primary);
+}
+
+/* Make sure all section headers are white on dark background */
+body.dark-theme .info-section h2 {
+    color: var(--text-primary) !important;
+}
+
+/* Make sure tab content area is dark */
+body.dark-theme .tab-content {
+    background-color: var(--dark-bg) !important;
+}
+
+/* Detailed content */
+body.dark-theme .detailed-content {
+    background-color: var(--dark-bg);
+}
+
+body.dark-theme .detailed-content h3 {
+    color: var(--primary-blue);
+    border-bottom: 2px solid var(--accent-yellow);
+}
+
+body.dark-theme .detailed-content p,
+body.dark-theme .detailed-content ul li,
+body.dark-theme .expandable-list-content p,
+body.dark-theme .expandable-list-content ul li {
+    color: var(--text-primary);
+}
+
+/* Last updated */
+body.dark-theme .last-updated {
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+}
+
+/* Section headers */
+body.dark-theme .info-section h3 {
+    color: var(--text-primary);
+}
+
+/* Theme toggle styles */
+body.dark-theme .theme-toggle {
+    background: var(--soft-white) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-theme .theme-toggle:hover {
+    background: var(--primary-blue) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Scrollbar customization */
+body.dark-theme ::-webkit-scrollbar {
+    width: 10px;
+}
+
+body.dark-theme ::-webkit-scrollbar-track {
+    background: var(--dark-bg);
+}
+
+body.dark-theme ::-webkit-scrollbar-thumb {
+    background: var(--lighter-bg);
+    border-radius: 5px;
+}
+
+body.dark-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-blue);
+}
+
+/* Selection color */
+body.dark-theme ::selection {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

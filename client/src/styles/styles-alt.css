@@ -1,0 +1,249 @@
+/* Alternative styles incorporating brand colors */
+:root {
+    --primary-blue: #26b6ca;
+    --accent-yellow: #fcd451;
+    --light-gray: #e0e0e0;
+    --lighter-gray: #f5f5f5;
+    --hover-gray: #e8e8e8;
+    --accent-red: #ff4a48;
+}
+
+/* Header styling */
+.caregiver-header {
+    background: linear-gradient(135deg, var(--primary-blue), #1c8a98);
+    border-bottom: 3px solid var(--accent-yellow);
+}
+
+.caregiver-header h1 {
+    color: white;
+}
+
+.back-button {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Search bar styling */
+.search-container {
+    background-color: var(--lighter-gray);
+    border-radius: 25px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.search-container:focus-within {
+    border-color: var(--primary-blue);
+}
+
+.search-icon {
+    color: var(--primary-blue);
+}
+
+.search-bar {
+    border: 1px solid var(--primary-blue);
+}
+
+.caregiver-header ~ .info-container .search-bar {
+    border: 0px solid var(--primary-blue);
+    border-color:transparent;
+}
+
+.search-box:focus, .search-bar:focus {
+    outline: none;
+    border: 1px solid var(--primary-blue);
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* Tab navigation */
+.tab-button {
+    border: 2px solid var(--primary-blue);
+    color: var(--primary-blue);
+    background: transparent;
+    transition: all 0.3s;
+}
+
+.tab-button:hover {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.tab-button.active {
+    background-color: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+/* Expandable sections */
+/* Parent expandable headers */
+.expandable-header {
+    position: relative;
+    padding: 15px 20px;
+    background-color: var(--lighter-gray);
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 2px solid transparent;
+    border-left: 4px solid var(--accent-yellow);
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+/* Child expandable headers */
+.expandable-content .expandable-header,
+.expandable-list-header {
+    margin: 0;
+    border-radius: 0;
+    border: 2px solid transparent;
+    border-left: 4px solid var(--primary-blue);
+    background-color: var(--lighter-gray);
+    transition: all 0.2s ease;
+}
+
+/* Hover states */
+.expandable-header:hover,
+.expandable-content .expandable-header:hover,
+.expandable-list-header:hover {
+    background-color: var(--hover-gray);
+    border: 2px solid var(--primary-blue);
+    border-left: 2px solid var(--primary-blue)!important;
+}
+
+/* Child expandable headers and content */
+.expandable-content {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: white;
+    display: none;
+    border-left: 1px solid var(--light-gray);
+}
+
+.expandable-list-content {
+    margin: 0;
+    padding: 15px;
+    background-color: white;
+    display: none;
+    border: none;
+}
+
+/* Active states 
+.expandable-header[aria-expanded="true"],
+.expandable-list-header[aria-expanded="true"] {
+    border-left: 4px solid var(--primary-blue);
+    background-color: var(--lighter-gray);
+}*/
+
+.arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease;
+}
+
+[aria-expanded="true"] .arrow {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+/* Override any other hover border colors */
+.caregiver-header ~ .info-container .expandable-header:hover,
+.recipient-header ~ .info-container .expandable-header:hover {
+    border-color: var(--primary-blue);
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* Action buttons */
+.action-button {
+    border: 1px solid var(--light-gray);
+    transition: all 0.3s;
+}
+
+.action-button:hover {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: white;
+}
+
+/* Print button specific */
+.action-button i.fa-print {
+    color: var(--primary-blue);
+}
+
+.action-button:hover i {
+    color: white;
+}
+
+/* Social share buttons */
+.action-button i.fa-facebook {
+    color: #1877f2;
+}
+
+.action-button i.fa-twitter {
+    color: #1da1f2;
+}
+
+.action-button i.fa-linkedin {
+    color: #0a66c2;
+}
+
+/* Info links */
+.info-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.info-link:hover {
+    color: var(--accent-red);
+}
+
+/* Last updated text */
+.last-updated {
+    color: var(--primary-blue);
+    font-style: italic;
+}
+
+/* Important highlights */
+.detailed-content h3 {
+    color: var(--primary-blue);
+    border-bottom: 2px solid var(--accent-yellow);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Subtle accents */
+.info-section {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(38, 182, 202, 0.1);
+}
+
+/* Error messages and alerts */
+.error-message {
+    color: var(--accent-red);
+}
+
+/* Success messages */
+.success-message {
+    color: var(--primary-blue);
+}
+
+/* Personal Growth section specific styles */
+
+.info-container .personal-growth-header:hover,
+.info-container .personal-growth-content .expandable-list-header:hover {
+    background-color: var(--primary-blue) !important;
+    border: 2px solid var(--primary-blue) !important;
+    color: black !important;
+}
+
+.info-container .personal-growth-content .expandable-header span,
+.info-container .personal-growth-content .expandable-list-header span,
+.info-container .personal-growth-content .expandable-header h3,
+.info-container .personal-growth-content .expandable-list-header h3 {
+    color: black !important;
+}
