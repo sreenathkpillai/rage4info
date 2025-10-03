@@ -12,7 +12,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     // Simple mock authentication
-    if (email === 'admin@care.com' && password === 'admin123') {
+    if (email === 'admin@rage4info.org' && password === 'manage2024') {
       localStorage.setItem('isAdmin', 'true');
       navigate('/admin');
     } else {
@@ -39,7 +39,7 @@ export default function LoginPage() {
               type="email"
               id="email"
               className="form-control"
-              placeholder="admin@care.com"
+              placeholder="admin@rage4info.org"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -76,8 +76,8 @@ export default function LoginPage() {
         <div className="login-footer">
           <p className="demo-info">
             Demo credentials:<br />
-            Email: admin@care.com<br />
-            Password: admin123
+            Email: admin@rage4info.org<br />
+            Password: manage2024
           </p>
         </div>
       </div>

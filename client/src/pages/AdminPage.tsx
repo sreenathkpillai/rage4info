@@ -366,7 +366,10 @@ export default function AdminPage() {
       <style>{`
         .admin-page {
           max-width: 100%;
-          height: calc(100vh - 200px);
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
         }
 
         .admin-header {
@@ -395,7 +398,8 @@ export default function AdminPage() {
           display: grid;
           grid-template-columns: 350px 1fr;
           gap: var(--spacing-lg);
-          height: 100%;
+          flex: 1;
+          overflow: hidden;
         }
 
         .admin-sidebar {
@@ -403,6 +407,7 @@ export default function AdminPage() {
           border-radius: var(--radius-lg);
           padding: var(--spacing-lg);
           overflow-y: auto;
+          max-height: 100%;
         }
 
         .page-selector {
@@ -491,8 +496,13 @@ export default function AdminPage() {
           transition: background var(--transition-fast);
         }
 
+        .tree-actions button {
+          color: var(--text-primary);
+        }
+
         .tree-actions button:hover {
           background: rgba(0, 0, 0, 0.1);
+          color: var(--text-primary);
         }
 
         .tree-sections {
@@ -514,12 +524,16 @@ export default function AdminPage() {
           border-radius: var(--radius-lg);
           padding: var(--spacing-lg);
           overflow-y: auto;
+          max-height: 100%;
+          display: flex;
+          flex-direction: column;
         }
 
         .editor-panel {
-          height: 100%;
+          flex: 1;
           display: flex;
           flex-direction: column;
+          overflow: hidden;
         }
 
         .editor-header {

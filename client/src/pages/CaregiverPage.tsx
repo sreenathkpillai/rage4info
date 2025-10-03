@@ -33,7 +33,7 @@ export default function CaregiverPage() {
       <div className="page-header">
         <div className="page-title">
           <User size={32} />
-          <h1>Caregiver Resources</h1>
+          <h1>Rage4Info for Care Givers</h1>
         </div>
         <p className="page-description">
           {pageData.description || 'Comprehensive resources and information for professional and family caregivers.'}

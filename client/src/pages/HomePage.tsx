@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <div className="hero-section">
-        <h1 className="hero-title">Welcome to Care Resource Hub</h1>
+        <h1 className="hero-title">Welcome to RAGE4INFO</h1>
         <p className="hero-subtitle">
           Your comprehensive resource for caregiving information and support
         </p>

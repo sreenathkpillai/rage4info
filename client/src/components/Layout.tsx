@@ -25,7 +25,7 @@ export default function Layout() {
 
           {/* Logo/Title */}
           <div className="header-title">
-            <h1>Care Resource Hub</h1>
+            <h1>RAGE4INFO</h1>
           </div>
 
           {/* Right Actions */}
@@ -81,7 +81,7 @@ export default function Layout() {
       {/* Footer */}
       <footer className="app-footer">
         <div className="footer-content">
-          <p>&copy; 2025 Care Resource Hub v2.0</p>
+          <p>&copy; 2025 RAGE4INFO v2.0</p>
           <p className="footer-links">
             <Link to="/">Home</Link>
             <span>•</span>
