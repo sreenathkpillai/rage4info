@@ -400,8 +400,8 @@ a:hover {
 }
 
 .section-header.expanded {
-  background: var(--accent-red);
-  color: white;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   border-left: 4px solid var(--accent-red);
 }
 
