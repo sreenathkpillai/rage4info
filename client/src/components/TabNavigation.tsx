@@ -1,4 +1,4 @@
-import { Tab } from '../../../shared/types';
+import type { Tab } from '../../../shared/types';
 import { useContentStore } from '../store/contentStore';
 import clsx from 'clsx';
 

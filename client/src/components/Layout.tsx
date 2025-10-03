@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, ArrowLeft, User, Heart, Settings, Home } from 'lucide-react';
+import { Moon, Sun, ArrowLeft, User, Heart, Settings } from 'lucide-react';
 import { useContentStore } from '../store/contentStore';
 import clsx from 'clsx';
 

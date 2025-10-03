@@ -14,40 +14,59 @@ ssh -i your-key.pem ec2-user@your-ec2-public-ip
 # Update system
 sudo dnf update -y
 
-# Install Docker
-sudo dnf install docker -y
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo usermod -aG docker ec2-user
-
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Create symlink for easier access
-sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+# Add swap space (CRITICAL for t2.micro instances)
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 # Install Git
 sudo dnf install git -y
 
-# Logout and login again to apply docker group
-exit
-# SSH back in
-ssh -i your-key.pem ec2-user@your-ec2-public-ip
+# Install Node.js and npm
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install nodejs -y
+
+# Install PM2 for process management
+sudo npm install -g pm2
+
+# Note: Skip Nginx installation if Apache is already running WordPress
+# We'll configure Apache to serve the app instead
+
+# Install MongoDB
+sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo <<EOF
+[mongodb-org-7.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/amazon/2023/mongodb-org/7.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc
+EOF
+
+sudo dnf install mongodb-org -y
+sudo systemctl start mongod
+sudo systemctl enable mongod
 
 # Verify installations
-docker --version
-docker-compose --version
-git --version
+node --version
+npm --version
+pm2 --version
+httpd -v
+mongod --version
 ```
 
 # Actuals
-[ec2-user@ip-172-31-11-117 ~]$ docker --version
-Docker version 25.0.8, build 0bab007
-[ec2-user@ip-172-31-11-117 ~]$ docker-compose --version
-Docker Compose version v2.21.0
-[ec2-user@ip-172-31-11-117 ~]$ git --version
-git version 2.47.1
+[ec2-user@ip-172-31-11-117 ~]$ node --version
+v20.18.0
+[ec2-user@ip-172-31-11-117 ~]$ npm --version
+10.8.2
+[ec2-user@ip-172-31-11-117 ~]$ pm2 --version
+5.4.2
+[ec2-user@ip-172-31-11-117 ~]$ nginx -v
+Server version: Apache/2.4.58 (Amazon Linux)
+[ec2-user@ip-172-31-11-117 ~]$ mongod --version
+db version v7.0.12
 
 ## 3. **Clone and Setup Project**
 
@@ -57,6 +76,10 @@ git clone https://github.com/sreenathkpillai/rage4info.git
 
 # Navigate to the project directory
 cd rage4info
+
+# Install dependencies
+cd server && npm install && cd ..
+cd client && npm install && cd ..
 
 # Create production environment files
 cp client/.env.example client/.env
@@ -74,7 +97,7 @@ nano server/.env
 ```env
 NODE_ENV=production
 PORT=3001
-MONGODB_URI=mongodb://mongodb:27017/care-resource-hub
+MONGODB_URI=mongodb://localhost:27017/care-resource-hub
 JWT_SECRET=your-super-secure-jwt-secret-change-this-to-something-random-32-chars-minimum
 CLIENT_URL=http://ec2-18-190-128-199.us-east-2.compute.amazonaws.com/apps/rage4info
 API_BASE_PATH=/apps/rage4info/api
@@ -99,29 +122,42 @@ VITE_BASE_URL=/apps/rage4info
 curl http://169.254.169.254/latest/meta-data/public-ipv4
 ```
 
-## 5. **Deploy with Docker Compose**
+## 5. **Build and Deploy Application**
 
 ```bash
-# Start all services (this will take a few minutes on first run)
-# Docker will automatically run npm install inside the containers
-docker-compose up -d
+# Build the server
+cd server
+npm run build
 
-# Check status - all services should show "Up"
-docker-compose ps
+# Start the API server with PM2
+pm2 start dist/server.js --name "care-hub-api" --env production
 
-# View logs to make sure everything started correctly
-docker-compose logs -f
+# Build the client
+cd ../client
+npm run build
 
-# Press Ctrl+C to exit log viewing
+# Create directory for the app and copy built files
+sudo mkdir -p /var/www/html/apps/rage4info
+sudo cp -r dist/* /var/www/html/apps/rage4info/
+
+# Start PM2 on boot
+pm2 startup
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp /home/ec2-user
+pm2 save
+
+# Check status
+pm2 status
+sudo systemctl status httpd
+sudo systemctl status mongod
 ```
 
-**Expected output from `docker-compose ps`:**
+**Expected PM2 output:**
 ```
-NAME                IMAGE               COMMAND                  SERVICE             STATUS              PORTS
-care-hub-api        v2_api              "npm start"              api                 running             0.0.0.0:3001->3001/tcp
-care-hub-db         mongo:7.0           "docker-entrypoint.s…"   mongodb             running             0.0.0.0:27017->27017/tcp
-care-hub-frontend   v2_frontend         "/docker-entrypoint.…"   frontend            running             0.0.0.0:3000->3000/tcp
-care-hub-redis      redis:7.2-alpine    "docker-entrypoint.s…"   redis               running             0.0.0.0:6379->6379/tcp
+┌─────┬──────────────────┬─────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id  │ name             │ mode    │ ↺      │ status  │ cpu      │ memory │ user │ watching │ restart  │ errored  │ log      │ actions  │
+├─────┼──────────────────┼─────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0   │ care-hub-api     │ fork    │ 0       │ online  │ 0%       │ 32.0mb │ ec2… │ disabled  │ 0        │ 0        │ ~/.pm2/… │ stop res…│
+└─────┴──────────────────┴─────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
 ```
 
 ## 6. **Configure EC2 Security Group**
@@ -135,70 +171,70 @@ In your AWS Console:
 
 | Type | Port | Source | Description |
 |------|------|--------|-------------|
-| HTTP | 3000 | 0.0.0.0/0 | Frontend |
-| HTTP | 3001 | 0.0.0.0/0 | API |
+| HTTP | 80 | 0.0.0.0/0 | Apache (Frontend) |
+| HTTP | 3001 | 0.0.0.0/0 | API (for testing) |
 | SSH | 22 | Your IP only | SSH access |
 
-## 7. **Configure Nginx for Subdirectory & WordPress Integration**
+## 7. **Configure Apache for Subdirectory & WordPress Integration**
 
-Since you have WordPress at the root and want this app at `/apps/rage4info`, we need to configure Nginx properly:
+Since you have WordPress running on Apache, we'll configure Apache to serve the app at `/apps/rage4info`:
 
 ```bash
-# Edit main Nginx config
-sudo nano /etc/nginx/nginx.conf
+# Enable Apache proxy modules (Amazon Linux way)
+sudo nano /etc/httpd/conf.modules.d/00-proxy.conf
 ```
 
-**Add this configuration inside the `http` block:**
-```nginx
-# Add this to your existing WordPress server block or create new one
-server {
-    listen 80;
-    server_name your-domain.com;  # Your actual domain
-
-    # WordPress at root (your existing config)
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-        # Your existing WordPress config here
-    }
-
-    # Care Resource Hub at /apps/rage4info
-    location /apps/rage4info/ {
-        proxy_pass http://localhost:3000/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        # Important for iframe embedding
-        proxy_set_header X-Frame-Options ALLOWALL;
-        add_header X-Frame-Options ALLOWALL;
-
-        # Handle React Router
-        try_files $uri $uri/ @react;
-    }
-
-    # Fallback for React Router in subdirectory
-    location @react {
-        proxy_pass http://localhost:3000/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    # API endpoint
-    location /apps/rage4info/api {
-        proxy_pass http://localhost:3001/api;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+**Make sure these lines are uncommented:**
+```apache
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
 ```
 
 ```bash
-# Test and restart Nginx
-sudo nginx -t
-sudo systemctl restart nginx
+# Create Apache config for the app
+sudo nano /etc/httpd/conf.d/care-hub.conf
+```
+
+**Add this configuration:**
+```apache
+# Care Resource Hub at /apps/rage4info
+Alias /apps/rage4info /var/www/html/apps/rage4info
+
+<Directory "/var/www/html/apps/rage4info">
+    AllowOverride All
+    Require all granted
+
+    # Important for iframe embedding
+    Header always set X-Frame-Options "ALLOWALL"
+
+    # Handle React Router - fallback to index.html
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /apps/rage4info/index.html [L]
+</Directory>
+
+# API endpoint proxy
+ProxyPass /apps/rage4info/api http://localhost:3001/api
+ProxyPassReverse /apps/rage4info/api http://localhost:3001/api
+ProxyPreserveHost On
+```
+
+```bash
+# Enable required Apache modules
+sudo nano /etc/httpd/conf.modules.d/00-base.conf
+```
+
+**Make sure these lines are uncommented:**
+```apache
+LoadModule rewrite_module modules/mod_rewrite.so
+LoadModule headers_module modules/mod_headers.so
+```
+
+```bash
+# Test and restart Apache
+sudo httpd -t
+sudo systemctl restart httpd
 ```
 
 ## 8. **Access Your Application**
@@ -221,17 +257,19 @@ curl http://localhost:3001/api/health
 # {"status":"ok","timestamp":"2025-01-03T...","uptime":123.45,"mongodb":"connected"}
 
 # Test frontend
-curl http://localhost:3000/health
+curl http://localhost/apps/rage4info
 
-# Should return: "healthy"
+# Should return HTML content
 
-# Check all containers are running
-docker-compose ps
+# Check all services are running
+pm2 status
+sudo systemctl status httpd
+sudo systemctl status mongod
 
 # View real-time logs
-docker-compose logs -f api      # API logs
-docker-compose logs -f frontend # Frontend logs
-docker-compose logs -f mongodb  # Database logs
+pm2 logs care-hub-api           # API logs
+sudo tail -f /var/log/httpd/access_log  # Apache access logs
+sudo tail -f /var/log/httpd/error_log   # Apache error logs
 ```
 
 ## 9. **Optional: Set Up Custom Domain & SSL**

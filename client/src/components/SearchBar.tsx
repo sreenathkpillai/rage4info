@@ -39,7 +39,7 @@ export default function SearchBar() {
         </button>
       )}
 
-      <style jsx>{`
+      <style>{`
         .search-clear {
           position: absolute;
           right: var(--spacing-lg);

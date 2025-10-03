@@ -4,7 +4,7 @@ export default function LoadingSpinner() {
       <div className="spinner"></div>
       <p className="loading-text">Loading content...</p>
 
-      <style jsx>{`
+      <style>{`
         .loading-container {
           display: flex;
           flex-direction: column;

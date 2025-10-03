@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Settings, Plus, Edit2, Trash2, Save, X, Move,
+  Settings, Plus, Edit2, Trash2, Save, X,
   FileText, Folder, ChevronRight, LogOut, Download, Upload
 } from 'lucide-react';
 import { useContentStore } from '../store/contentStore';
 import { Editor } from '@tinymce/tinymce-react';
-import { Tab, Section, ContentItem } from '../../../shared/types';
+import type { Tab, Section, ContentItem } from '../../../shared/types';
 import clsx from 'clsx';
 
 export default function AdminPage() {
@@ -357,7 +357,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .admin-page {
           max-width: 100%;
           height: calc(100vh - 200px);
@@ -725,7 +725,7 @@ function ContentItemEditor({ item, onSave }: { item: ContentItem; onSave: (item:
         <Save size={18} /> Save Content
       </button>
 
-      <style jsx>{`
+      <style>{`
         .editor-form {
           max-width: 800px;
         }

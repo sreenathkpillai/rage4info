@@ -82,7 +82,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .login-page {
           display: flex;
           align-items: center;

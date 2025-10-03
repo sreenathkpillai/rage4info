@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp, FileText, Clock, Link as LinkIcon } from 'lucide-react';
-import { Section } from '../../../shared/types';
+import type { Section } from '../../../shared/types';
 import { useContentStore } from '../store/contentStore';
 import { format } from 'date-fns';
 import clsx from 'clsx';
@@ -100,7 +100,7 @@ export default function ContentDisplay({ sections }: ContentDisplayProps) {
         </div>
       ))}
 
-      <style jsx>{`
+      <style>{`
         .content-display {
           margin-top: var(--spacing-lg);
         }

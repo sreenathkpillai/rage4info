@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useContentStore } from '../store/contentStore';
-import { ContentSchema } from '../../../shared/types';
 
 // Mock axios
 vi.mock('axios', () => ({

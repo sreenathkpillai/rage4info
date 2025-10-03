@@ -67,7 +67,7 @@ export default function HomePage() {
         </Link>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .home-page {
           max-width: 1200px;
           margin: 0 auto;
