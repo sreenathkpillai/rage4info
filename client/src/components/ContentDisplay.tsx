@@ -126,7 +126,7 @@ export default function ContentDisplay({ sections }: ContentDisplayProps) {
 
       <style>{`
         .content-display {
-          margin-top: var(--spacing-lg);
+          margin-top: calc(var(--spacing-lg) / 2);
         }
 
         .no-results {

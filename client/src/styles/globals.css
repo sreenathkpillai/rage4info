@@ -358,8 +358,11 @@ a:hover {
 }
 
 .tab-button:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: var(--brand-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--brand-primary);
 }
 
 .tab-button.active {
@@ -397,8 +400,9 @@ a:hover {
 }
 
 .section-header.expanded {
-  background: var(--brand-gradient);
+  background: var(--accent-red);
   color: white;
+  border-left: 4px solid var(--accent-red);
 }
 
 .section-title {
@@ -462,8 +466,9 @@ a:hover {
 }
 
 .content-item-header.expanded {
-  background: var(--brand-gradient);
-  color: white;
+  border-left: 3px solid var(--brand-primary);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .content-item-title {
@@ -495,6 +500,7 @@ a:hover {
 .content-item-body.expanded {
   max-height: 2000px;
   padding: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
 }
 
 .content-item-body ul,
