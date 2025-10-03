@@ -372,7 +372,7 @@ a:hover {
 }
 
 .tab-content {
-  padding: var(--spacing-xl) 0;
+  padding: 0 0 var(--spacing-xl) 0;
 }
 
 /* Sections */
@@ -478,6 +478,7 @@ a:hover {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  margin: 0;
 }
 
 .content-item-chevron {
