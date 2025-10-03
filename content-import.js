@@ -135,22 +135,21 @@ async function importFromOutline(filePath) {
   for (const line of lines) {
     const trimmed = line.trim();
 
-    // Check for Care Recipient delimiter
-    if (trimmed === '*****CARE RECIPIENTS STARTS HERE*****') {
-      saveCurrentItem();
-      currentPage = pages.get('carerecipient');
-      currentTab = null;
-      currentSection = null;
-      currentItem = null;
-      continue;
-    }
-
     if (trimmed.startsWith('# PAGE:')) {
       saveCurrentItem();
-      const pageKey = trimmed.replace('# PAGE:', '').trim().toLowerCase();
-      currentPage = pages.get(pageKey);
+      const pageTitle = trimmed.replace('# PAGE:', '').trim();
+      const pageKey = pageTitle.toLowerCase().replace(/\s+/g, '');
+
+      if (pageKey === 'caregiver') {
+        currentPage = pages.get('caregiver');
+      } else if (pageKey === 'carerecipient' || pageKey === 'recipient') {
+        currentPage = pages.get('carerecipient');
+      } else {
+        currentPage = pages.get(pageKey);
+      }
+
       if (!currentPage) {
-        console.warn(`Unknown page: ${pageKey}`);
+        console.warn(`Unknown page: ${pageKey} (from: ${pageTitle})`);
       }
     } else if (trimmed.startsWith('## TAB:') && currentPage) {
       saveCurrentItem();

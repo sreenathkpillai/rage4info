@@ -364,8 +364,6 @@ Sources: https://www.helpguide.org/articles/relationships-communication/conflict
 - Treat all individuals with dignity and respect
 ---
 
-*****CARE RECIPIENTS STARTS HERE*****
-
 # PAGE: Care Recipient
 ## TAB: Direct Care
 ### SECTION: Independent Living Options
