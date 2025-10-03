@@ -16,46 +16,42 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/care-r
 
 // Content Schema (matching server model)
 const contentSchema = new mongoose.Schema({
-  caregiver: {
-    tabs: [{
+  pages: {
+    type: Map,
+    of: {
       id: String,
       title: String,
-      order: Number,
-      sections: [{
+      description: String,
+      tabs: [{
         id: String,
         title: String,
         order: Number,
-        items: [{
+        visible: { type: Boolean, default: true },
+        sections: [{
           id: String,
           title: String,
-          content: String,
-          sources: String,
-          lastUpdated: String,
-          order: Number
+          order: Number,
+          collapsible: { type: Boolean, default: true },
+          expanded: { type: Boolean, default: false },
+          items: [{
+            id: String,
+            title: String,
+            content: String,
+            sources: String,
+            lastUpdated: String,
+            order: Number
+          }]
         }]
       }]
-    }]
+    }
   },
-  carerecipient: {
-    tabs: [{
-      id: String,
-      title: String,
-      order: Number,
-      sections: [{
-        id: String,
-        title: String,
-        order: Number,
-        items: [{
-          id: String,
-          title: String,
-          content: String,
-          sources: String,
-          lastUpdated: String,
-          order: Number
-        }]
-      }]
-    }]
+  metadata: {
+    version: { type: String, default: '2.0.0' },
+    lastModified: String,
+    author: String
   }
+}, {
+  timestamps: true
 });
 
 const Content = mongoose.model('Content', contentSchema);
@@ -96,10 +92,19 @@ async function importFromOutline(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split('\n');
 
-  const structure = {
-    caregiver: { tabs: [] },
-    carerecipient: { tabs: [] }
-  };
+  const pages = new Map();
+  pages.set('caregiver', {
+    id: 'caregiver',
+    title: 'Caregiver Resources',
+    description: 'Comprehensive resources and information for professional and family caregivers.',
+    tabs: []
+  });
+  pages.set('carerecipient', {
+    id: 'carerecipient',
+    title: 'Care Recipient Resources',
+    description: 'Information and support resources for individuals receiving care.',
+    tabs: []
+  });
 
   let currentPage = null;
   let currentTab = null;
@@ -132,27 +137,31 @@ async function importFromOutline(filePath) {
 
     if (trimmed.startsWith('# PAGE:')) {
       saveCurrentItem();
-      currentPage = trimmed.replace('# PAGE:', '').trim().toLowerCase();
-      if (!structure[currentPage]) {
-        structure[currentPage] = { tabs: [] };
+      const pageKey = trimmed.replace('# PAGE:', '').trim().toLowerCase();
+      currentPage = pages.get(pageKey);
+      if (!currentPage) {
+        console.warn(`Unknown page: ${pageKey}`);
       }
-    } else if (trimmed.startsWith('## TAB:')) {
+    } else if (trimmed.startsWith('## TAB:') && currentPage) {
       saveCurrentItem();
       const tabTitle = trimmed.replace('## TAB:', '').trim();
       currentTab = {
         id: generateId(tabTitle),
         title: tabTitle,
-        order: structure[currentPage].tabs.length,
+        order: currentPage.tabs.length,
+        visible: true,
         sections: []
       };
-      structure[currentPage].tabs.push(currentTab);
-    } else if (trimmed.startsWith('### SECTION:')) {
+      currentPage.tabs.push(currentTab);
+    } else if (trimmed.startsWith('### SECTION:') && currentTab) {
       saveCurrentItem();
       const sectionTitle = trimmed.replace('### SECTION:', '').trim();
       currentSection = {
         id: generateId(sectionTitle),
         title: sectionTitle,
         order: currentTab.sections.length,
+        collapsible: true,
+        expanded: false,
         items: []
       };
       currentTab.sections.push(currentSection);
@@ -174,8 +183,15 @@ async function importFromOutline(filePath) {
   // Clear existing content
   await Content.deleteMany({});
 
-  // Insert new content
-  const contentDoc = new Content(structure);
+  // Insert new content with proper structure
+  const contentDoc = new Content({
+    pages: pages,
+    metadata: {
+      version: '2.0.0',
+      lastModified: new Date().toISOString(),
+      author: 'Import Script'
+    }
+  });
   await contentDoc.save();
 
   console.log('✅ Outline import completed');
