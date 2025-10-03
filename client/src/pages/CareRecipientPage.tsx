@@ -33,7 +33,7 @@ export default function CareRecipientPage() {
       <div className="page-header">
         <div className="page-title">
           <Heart size={32} />
-          <h1>Care Recipient Resources</h1>
+          <h1>Rage4Info for People with Disabilities</h1>
         </div>
         <p className="page-description">
           {pageData.description || 'Information and support resources for individuals receiving care.'}
