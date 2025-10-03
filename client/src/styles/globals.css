@@ -133,6 +133,7 @@ a:hover {
 
 .header-content {
   max-width: 1024px;
+  width: 100%;
   margin: 0 auto;
   padding: var(--spacing-md) var(--spacing-lg);
   display: flex;
