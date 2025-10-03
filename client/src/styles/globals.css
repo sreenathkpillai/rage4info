@@ -12,15 +12,15 @@
   --border-hover: #cbd5e0;
 
   /* Brand colors */
-  --brand-primary: #667eea;
-  --brand-secondary: #764ba2;
-  --brand-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --brand-primary: #26b6ca;
+  --brand-secondary: #1c8a98;
+  --brand-gradient: linear-gradient(135deg, #26b6ca 0%, #1c8a98 100%);
 
   /* Accent colors */
   --accent-blue: #26b6ca;
   --accent-green: #48bb78;
-  --accent-red: #f56565;
-  --accent-yellow: #ed8936;
+  --accent-red: #ff4a48;
+  --accent-yellow: #fcd451;
 
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
@@ -374,7 +374,7 @@ a:hover {
 
 /* Sections */
 .content-section {
-  margin-bottom: 0;
+  margin-bottom: 5px;
 }
 
 .section-header {
@@ -384,6 +384,7 @@ a:hover {
   padding: var(--spacing-md) var(--spacing-lg);
   background: var(--bg-secondary);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-left: 4px solid var(--accent-yellow);
   cursor: pointer;
   transition: all var(--transition-fast);
   margin-bottom: 0;
@@ -392,6 +393,7 @@ a:hover {
 .section-header:hover {
   background: var(--bg-tertiary);
   box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--brand-primary);
 }
 
 .section-header.expanded {
@@ -432,7 +434,7 @@ a:hover {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  margin-bottom: 0;
+  margin-bottom: 2px;
   transition: all var(--transition-fast);
   border-top: 1px solid var(--border-color);
 }
@@ -447,13 +449,16 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
+  border-left: 3px solid var(--accent-blue);
+  background: var(--bg-secondary);
   cursor: pointer;
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
   margin-bottom: 0;
 }
 
 .content-item-header:hover {
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--brand-primary);
 }
 
 .content-item-header.expanded {
@@ -484,11 +489,11 @@ a:hover {
   padding: 0;
   max-height: 0;
   overflow: hidden;
-  transition: max-height var(--transition-slow);
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .content-item-body.expanded {
-  max-height: 1000px;
+  max-height: 2000px;
   padding: var(--spacing-lg);
 }
 
