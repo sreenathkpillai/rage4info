@@ -135,6 +135,16 @@ async function importFromOutline(filePath) {
   for (const line of lines) {
     const trimmed = line.trim();
 
+    // Check for Care Recipient delimiter
+    if (trimmed === '*****CARE RECIPIENTS STARTS HERE*****') {
+      saveCurrentItem();
+      currentPage = pages.get('carerecipient');
+      currentTab = null;
+      currentSection = null;
+      currentItem = null;
+      continue;
+    }
+
     if (trimmed.startsWith('# PAGE:')) {
       saveCurrentItem();
       const pageKey = trimmed.replace('# PAGE:', '').trim().toLowerCase();
