@@ -52,13 +52,11 @@ git version 2.47.1
 ## 3. **Clone and Setup Project**
 
 ```bash
-# Clone your repository (replace with your actual repo URL)
-git clone https://github.com/your-username/care-resource-hub.git
+# Clone the repository
+git clone https://github.com/sreenathkpillai/rage4info.git
 
-# If you don't have a git repo yet, you can upload the v2 folder directly:
-# scp -i your-key.pem -r ./v2 ec2-user@your-ec2-ip:~/care-resource-hub/
-
-cd care-resource-hub/v2
+# Navigate to the project directory
+cd rage4info
 
 # Create production environment files
 cp client/.env.example client/.env
@@ -89,7 +87,7 @@ nano client/.env
 
 **Update client/.env with:**
 ```env
-VITE_API_URL=http://your-ec2-public-ip/apps/rage4info/api
+VITE_API_URL=http://ec2-18-190-128-199.us-east-2.compute.amazonaws.com/apps/rage4info/api
 VITE_TINYMCE_API_KEY=n0f2s874rmn85hrrfw88rvv34rjelbp19avlarqf2u41m8u4
 VITE_APP_TITLE=Care Resource Hub
 VITE_APP_VERSION=2.0.0
