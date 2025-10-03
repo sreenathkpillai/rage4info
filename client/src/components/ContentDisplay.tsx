@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp, FileText, Clock, Link as LinkIcon } from 'lucid
 import type { Section } from '../../../shared/types';
 import { useContentStore } from '../store/contentStore';
 import { format } from 'date-fns';
+import { useState } from 'react';
 import clsx from 'clsx';
 
 interface ContentDisplayProps {
@@ -10,6 +11,19 @@ interface ContentDisplayProps {
 
 export default function ContentDisplay({ sections }: ContentDisplayProps) {
   const { toggleSection, searchQuery } = useContentStore();
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
+  const toggleItem = (itemId: string) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
 
   // Filter sections and items based on search
   const filteredSections = sections.map(section => {
@@ -62,40 +76,50 @@ export default function ContentDisplay({ sections }: ContentDisplayProps) {
           )}
 
           <div className={clsx('section-content', { expanded: section.expanded || !section.collapsible })}>
-            {section.items.map(item => (
-              <div key={item.id} className="content-item">
-                <div className="content-item-header">
-                  <h3 className="content-item-title">
-                    <FileText size={20} />
-                    {item.title}
-                  </h3>
-                </div>
+            {section.items.map(item => {
+              const isItemExpanded = expandedItems.has(item.id);
+              return (
+                <div key={item.id} className="content-item">
+                  <div
+                    className={clsx('content-item-header', { expanded: isItemExpanded })}
+                    onClick={() => toggleItem(item.id)}
+                  >
+                    <h3 className="content-item-title">
+                      <FileText size={20} />
+                      {item.title}
+                    </h3>
+                    <div className="content-item-chevron">
+                      {isItemExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </div>
+                  </div>
 
-                <div
-                  className="content-item-body"
-                  dangerouslySetInnerHTML={{ __html: item.content }}
-                />
+                  <div
+                    className={clsx('content-item-body', { expanded: isItemExpanded })}
+                  >
+                    <div dangerouslySetInnerHTML={{ __html: item.content }} />
 
-                {(item.sources || item.lastUpdated) && (
-                  <div className="content-item-footer">
-                    {item.sources && (
-                      <div className="content-sources">
-                        <LinkIcon size={16} />
-                        <span dangerouslySetInnerHTML={{ __html: item.sources }} />
-                      </div>
-                    )}
-                    {item.lastUpdated && (
-                      <div className="content-updated">
-                        <Clock size={16} />
-                        <span>
-                          Updated: {format(new Date(item.lastUpdated), 'MMM d, yyyy')}
-                        </span>
+                    {(item.sources || item.lastUpdated) && (
+                      <div className="content-item-footer">
+                        {item.sources && (
+                          <div className="content-sources">
+                            <LinkIcon size={16} />
+                            <span dangerouslySetInnerHTML={{ __html: item.sources }} />
+                          </div>
+                        )}
+                        {item.lastUpdated && (
+                          <div className="content-updated">
+                            <Clock size={16} />
+                            <span>
+                              Updated: {format(new Date(item.lastUpdated), 'MMM d, yyyy')}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       ))}
