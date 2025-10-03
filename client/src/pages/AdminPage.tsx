@@ -31,6 +31,17 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [editMode, setEditMode] = useState<'tab' | 'section' | 'item' | null>(null);
 
+  // Helper function to start editing with auto-cancel
+  const startEdit = (mode: 'tab' | 'section' | 'item', item: any) => {
+    // Auto-cancel any existing edit
+    setEditMode(null);
+    setEditingItem(null);
+
+    // Start new edit
+    setEditMode(mode);
+    setEditingItem(item);
+  };
+
   // Check authentication
   useEffect(() => {
     const isAdmin = localStorage.getItem('isAdmin');
@@ -127,8 +138,7 @@ export default function AdminPage() {
             <button
               className="btn btn-success btn-sm"
               onClick={() => {
-                setEditMode('tab');
-                setEditingItem({
+                startEdit('tab', {
                   id: `tab-${Date.now()}`,
                   title: 'New Tab',
                   sections: [],
@@ -153,8 +163,7 @@ export default function AdminPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setEditMode('tab');
-                          setEditingItem(tab);
+                          startEdit('tab', tab);
                         }}
                       >
                         <Edit2 size={14} />
@@ -177,13 +186,13 @@ export default function AdminPage() {
                       <button
                         className="btn btn-success btn-sm"
                         onClick={() => {
-                          setEditMode('section');
-                          setEditingItem({
+                          startEdit('section', {
                             id: `section-${Date.now()}`,
                             title: 'New Section',
                             items: [],
                             order: tab.sections.length,
-                            collapsible: true
+                            collapsible: true,
+                            expanded: false
                           });
                         }}
                       >
@@ -202,8 +211,7 @@ export default function AdminPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setEditMode('section');
-                                  setEditingItem(section);
+                                  startEdit('section', section);
                                 }}
                               >
                                 <Edit2 size={14} />
@@ -226,8 +234,7 @@ export default function AdminPage() {
                               <button
                                 className="btn btn-success btn-sm"
                                 onClick={() => {
-                                  setEditMode('item');
-                                  setEditingItem({
+                                  startEdit('item', {
                                     id: `item-${Date.now()}`,
                                     title: 'New Content',
                                     content: '',
@@ -247,8 +254,7 @@ export default function AdminPage() {
                                   <div className="tree-actions">
                                     <button
                                       onClick={() => {
-                                        setEditMode('item');
-                                        setEditingItem(item);
+                                        startEdit('item', item);
                                       }}
                                     >
                                       <Edit2 size={12} />
@@ -420,6 +426,7 @@ export default function AdminPage() {
           border-radius: var(--radius-md);
           cursor: pointer;
           transition: all var(--transition-fast);
+          color: var(--text-primary);
         }
 
         .page-btn.active {
@@ -462,15 +469,17 @@ export default function AdminPage() {
         }
 
         .tree-actions {
-          display: none;
+          opacity: 0;
+          display: flex;
           gap: var(--spacing-xs);
           margin-left: auto;
+          transition: opacity var(--transition-fast);
         }
 
         .tree-tab:hover .tree-actions,
         .tree-section:hover .tree-actions,
         .tree-content-item:hover .tree-actions {
-          display: flex;
+          opacity: 1;
         }
 
         .tree-actions button {
