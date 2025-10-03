@@ -41,6 +41,14 @@ docker-compose --version
 git --version
 ```
 
+# Actuals
+[ec2-user@ip-172-31-11-117 ~]$ docker --version
+Docker version 25.0.8, build 0bab007
+[ec2-user@ip-172-31-11-117 ~]$ docker-compose --version
+Docker Compose version v2.21.0
+[ec2-user@ip-172-31-11-117 ~]$ git --version
+git version 2.47.1
+
 ## 3. **Clone and Setup Project**
 
 ```bash
@@ -70,7 +78,7 @@ NODE_ENV=production
 PORT=3001
 MONGODB_URI=mongodb://mongodb:27017/care-resource-hub
 JWT_SECRET=your-super-secure-jwt-secret-change-this-to-something-random-32-chars-minimum
-CLIENT_URL=http://your-ec2-public-ip/apps/rage4info
+CLIENT_URL=http://ec2-18-190-128-199.us-east-2.compute.amazonaws.com/apps/rage4info
 API_BASE_PATH=/apps/rage4info/api
 ```
 
