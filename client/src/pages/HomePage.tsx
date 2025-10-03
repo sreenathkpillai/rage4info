@@ -69,7 +69,7 @@ export default function HomePage() {
 
       <style>{`
         .home-page {
-          max-width: 1200px;
+          max-width: 1024px;
           margin: 0 auto;
         }
 
