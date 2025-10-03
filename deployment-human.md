@@ -103,6 +103,7 @@ curl http://169.254.169.254/latest/meta-data/public-ipv4
 
 ```bash
 # Start all services (this will take a few minutes on first run)
+# Docker will automatically run npm install inside the containers
 docker-compose up -d
 
 # Check status - all services should show "Up"
