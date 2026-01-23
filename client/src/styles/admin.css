@@ -1,0 +1,311 @@
+/* Admin panel specific styles - Drag and Drop UI improvements */
+
+/* Sortable item base styles */
+.sortable-item {
+  cursor: move;
+  position: relative;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.sortable-item:hover {
+  border-color: var(--brand-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Drag handle indicator */
+.sortable-item::before {
+  content: '⋮⋮';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.sortable-item:hover::before {
+  opacity: 1;
+}
+
+/* Dragging state */
+.sortable-item.dragging {
+  opacity: 0.5;
+  transform: rotate(3deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+/* Drop zone indicators */
+.drop-zone {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.drop-zone.drag-over {
+  background: rgba(var(--brand-primary-rgb), 0.1);
+  border: 2px dashed var(--brand-primary);
+  border-radius: var(--radius-md);
+}
+
+.drop-zone.drop-above::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--brand-primary);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+.drop-zone.drop-below::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--brand-primary);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+/* Enhanced tree item styling for drag-drop */
+.tree-item.sortable-item {
+  margin-left: 20px; /* Make room for drag handle */
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+}
+
+.tree-item.sortable-item .tree-tab,
+.tree-item.sortable-item .tree-section,
+.tree-item.sortable-item .tree-content-item {
+  background: transparent;
+  margin: 0;
+}
+
+/* Drag helper text */
+.drag-helper {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.drag-helper.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Drag feedback animations */
+@keyframes dragStart {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1) rotate(2deg);
+  }
+}
+
+.sortable-item.drag-starting {
+  animation: dragStart 0.2s ease;
+}
+
+/* Preview modal styles */
+.preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.preview-modal-content {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.preview-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.preview-modal-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.preview-modal-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
+
+.preview-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--text-secondary);
+}
+
+.preview-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--brand-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Enhanced admin header with preview button */
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.preview-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--brand-gradient);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.preview-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--brand-primary-rgb), 0.3);
+}
+
+.preview-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Instructions panel for drag-drop */
+.drag-instructions {
+  background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.1), rgba(var(--brand-primary-rgb), 0.05));
+  border: 1px solid rgba(var(--brand-primary-rgb), 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.drag-instructions h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--brand-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.drag-instructions p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sortable-item::before {
+    left: -15px;
+    font-size: 12px;
+  }
+
+  .tree-item.sortable-item {
+    margin-left: 15px;
+  }
+
+  .preview-modal-content {
+    width: 95vw;
+    height: 95vh;
+  }
+
+  .drag-helper {
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .sortable-item::before {
+    color: #666;
+  }
+
+  .drag-helper {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+  }
+
+  .preview-iframe {
+    background: var(--bg-primary);
+  }
+}

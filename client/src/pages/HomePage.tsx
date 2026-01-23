@@ -1,14 +1,38 @@
 import { Link } from 'react-router-dom';
 import { User, Heart, Shield, Clock, Users, BookOpen } from 'lucide-react';
+import { useContentStore } from '../store/contentStore';
+
+// Default landing page content
+const defaultLandingPage = {
+  heroTitle: 'Welcome to RAGE4INFO',
+  heroSubtitle: 'Your comprehensive resource for caregiving information and support',
+  caregiverCard: {
+    title: 'INFO4 Caregivers',
+    description: 'Access resources, training materials, and support tools designed specifically for professional and family caregivers.',
+    buttonText: 'Explore Caregiver Resources'
+  },
+  careRecipientCard: {
+    title: 'INFO4 People with Disabilities',
+    description: 'Find information about care options, support services, and resources to help maintain independence and quality of life.',
+    buttonText: 'Explore Care Recipient Resources'
+  }
+};
 
 export default function HomePage() {
+  const { content } = useContentStore();
+
+  // Use store values with fallbacks to defaults
+  const landingPage = content?.landingPage || defaultLandingPage;
+  const heroTitle = landingPage.heroTitle || defaultLandingPage.heroTitle;
+  const heroSubtitle = landingPage.heroSubtitle || defaultLandingPage.heroSubtitle;
+  const caregiverCard = { ...defaultLandingPage.caregiverCard, ...landingPage.caregiverCard };
+  const careRecipientCard = { ...defaultLandingPage.careRecipientCard, ...landingPage.careRecipientCard };
+
   return (
     <div className="home-page">
       <div className="hero-section">
-        <h1 className="hero-title">Welcome to RAGE4INFO</h1>
-        <p className="hero-subtitle">
-          Your comprehensive resource for caregiving information and support
-        </p>
+        <h1 className="hero-title">{heroTitle}</h1>
+        <p className="hero-subtitle">{heroSubtitle}</p>
       </div>
 
       <div className="role-cards">
@@ -16,10 +40,8 @@ export default function HomePage() {
           <div className="role-card-icon">
             <User size={48} />
           </div>
-          <h2 className="role-card-title">For Caregivers</h2>
-          <p className="role-card-description">
-            Access resources, training materials, and support tools designed specifically for professional and family caregivers.
-          </p>
+          <h2 className="role-card-title">{caregiverCard.title}</h2>
+          <p className="role-card-description">{caregiverCard.description}</p>
           <div className="role-card-features">
             <div className="feature-item">
               <Shield size={20} />
@@ -35,7 +57,7 @@ export default function HomePage() {
             </div>
           </div>
           <button className="btn btn-primary">
-            Explore Caregiver Resources
+            {caregiverCard.buttonText}
           </button>
         </Link>
 
@@ -43,10 +65,8 @@ export default function HomePage() {
           <div className="role-card-icon">
             <Heart size={48} />
           </div>
-          <h2 className="role-card-title">For Care Recipients</h2>
-          <p className="role-card-description">
-            Find information about care options, support services, and resources to help maintain independence and quality of life.
-          </p>
+          <h2 className="role-card-title">{careRecipientCard.title}</h2>
+          <p className="role-card-description">{careRecipientCard.description}</p>
           <div className="role-card-features">
             <div className="feature-item">
               <Users size={20} />
@@ -62,7 +82,7 @@ export default function HomePage() {
             </div>
           </div>
           <button className="btn btn-primary">
-            Explore Care Recipient Resources
+            {careRecipientCard.buttonText}
           </button>
         </Link>
       </div>
@@ -163,6 +183,16 @@ export default function HomePage() {
         .role-card-title {
           font-size: 1.75rem;
           margin-bottom: var(--spacing-md);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* Ensure desktop titles fit on one line */
+        @media (min-width: 901px) {
+          .role-card-title {
+            font-size: 1.5rem;
+          }
         }
 
         .role-card-description {

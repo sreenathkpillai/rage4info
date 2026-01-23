@@ -6,6 +6,7 @@ interface IContentItem {
     sources?: string;
     lastUpdated: string;
     order: number;
+    visible?: boolean;
 }
 interface ISection {
     id: string;
@@ -14,6 +15,7 @@ interface ISection {
     order: number;
     collapsible: boolean;
     expanded?: boolean;
+    visible?: boolean;
 }
 interface ITab {
     id: string;
@@ -30,10 +32,25 @@ interface IPage {
     tabs: ITab[];
     theme?: 'light' | 'dark';
 }
+interface ILandingPageConfig {
+    heroTitle: string;
+    heroSubtitle: string;
+    caregiverCard: {
+        title: string;
+        description: string;
+        buttonText: string;
+    };
+    careRecipientCard: {
+        title: string;
+        description: string;
+        buttonText: string;
+    };
+}
 export interface IContentDocument extends Document {
     pages: {
         [pageId: string]: IPage;
     };
+    landingPage?: ILandingPageConfig;
     metadata?: {
         version: string;
         lastModified: string;

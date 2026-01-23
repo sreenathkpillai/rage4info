@@ -8,6 +8,8 @@ import CareRecipientPage from './pages/CareRecipientPage';
 import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
 import './styles/globals.css';
+import './styles/themes.css';
+import './styles/mobile.css';
 
 function App() {
   const { loadContent, theme } = useContentStore();

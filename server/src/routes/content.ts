@@ -1,15 +1,29 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Content from '../models/Content';
 import fs from 'fs/promises';
 import path from 'path';
 
 const router = express.Router();
 
+// Helper function to check if MongoDB is available
+const isMongoAvailable = () => {
+  return mongoose.connection.readyState === 1;
+};
+
 // Get content (from MongoDB or fallback to JSON file)
 router.get('/', async (req, res) => {
   try {
-    // Try to get from MongoDB first
-    const content = await Content.findOne().sort({ updatedAt: -1 }).exec();
+    let content = null;
+
+    // Try to get from MongoDB only if it's available
+    if (isMongoAvailable()) {
+      try {
+        content = await Content.findOne().sort({ updatedAt: -1 }).exec();
+      } catch (mongoError) {
+        console.warn('MongoDB query failed, falling back to file system:', mongoError);
+      }
+    }
 
     if (content) {
       return res.json({
@@ -17,7 +31,8 @@ router.get('/', async (req, res) => {
         data: {
           pages: content.pages,
           metadata: content.metadata
-        }
+        },
+        source: 'mongodb'
       });
     }
 
@@ -33,6 +48,8 @@ router.get('/', async (req, res) => {
         source: 'fallback'
       });
     } catch (fileError) {
+      console.warn('Fallback file not found, using default content');
+
       // If no file exists, return default structure
       const defaultContent = {
         pages: {
@@ -83,42 +100,72 @@ router.put('/', async (req, res) => {
       });
     }
 
-    // Update or create content in MongoDB
-    const updatedContent = await Content.findOneAndUpdate(
-      {},
-      {
-        pages,
-        metadata: {
-          ...metadata,
-          lastModified: new Date().toISOString()
-        }
-      },
-      {
-        upsert: true,
-        new: true,
-        runValidators: true
-      }
-    );
+    const updatedMetadata = {
+      ...metadata,
+      lastModified: new Date().toISOString()
+    };
 
-    // Also save to backup file
+    let mongoSaved = false;
+    let updatedContent = null;
+
+    // Try to save to MongoDB if available
+    if (isMongoAvailable()) {
+      try {
+        updatedContent = await Content.findOneAndUpdate(
+          {},
+          {
+            pages,
+            metadata: updatedMetadata
+          },
+          {
+            upsert: true,
+            new: true,
+            runValidators: true
+          }
+        );
+        mongoSaved = true;
+      } catch (mongoError) {
+        console.warn('Failed to save to MongoDB:', mongoError);
+        mongoSaved = false;
+      }
+    }
+
+    // Always save to backup file (primary storage if MongoDB unavailable)
+    let fileSaved = false;
     try {
       const backupDir = path.join(__dirname, '../../data');
       await fs.mkdir(backupDir, { recursive: true });
 
       const backupPath = path.join(backupDir, 'content.json');
-      await fs.writeFile(backupPath, JSON.stringify({ pages, metadata }, null, 2));
+      const contentToSave = { pages, metadata: updatedMetadata };
+      await fs.writeFile(backupPath, JSON.stringify(contentToSave, null, 2));
+      fileSaved = true;
     } catch (fileError) {
-      console.warn('Failed to save backup file:', fileError);
-      // Don't fail the request if backup fails
+      console.error('Failed to save to file:', fileError);
+      fileSaved = false;
     }
+
+    if (!mongoSaved && !fileSaved) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to save content to both MongoDB and file system'
+      });
+    }
+
+    const responseData = updatedContent ? {
+      pages: updatedContent.pages,
+      metadata: updatedContent.metadata
+    } : { pages, metadata: updatedMetadata };
 
     res.json({
       success: true,
-      data: {
-        pages: updatedContent.pages,
-        metadata: updatedContent.metadata
-      },
-      message: 'Content saved successfully'
+      data: responseData,
+      message: 'Content saved successfully',
+      storage: {
+        mongodb: mongoSaved,
+        file: fileSaved,
+        primary: mongoSaved ? 'mongodb' : 'file'
+      }
     });
   } catch (error) {
     console.error('Error saving content:', error);
@@ -225,22 +272,59 @@ router.post('/import', async (req, res) => {
 // Health check for content API
 router.get('/health', async (req, res) => {
   try {
-    const contentCount = await Content.countDocuments();
-    const latestContent = await Content.findOne().sort({ updatedAt: -1 }).select('updatedAt metadata').exec();
+    if (isMongoAvailable()) {
+      try {
+        const contentCount = await Content.countDocuments();
+        const latestContent = await Content.findOne().sort({ updatedAt: -1 }).select('updatedAt metadata').exec();
 
-    res.json({
-      success: true,
-      data: {
-        totalVersions: contentCount,
-        latestUpdate: latestContent?.updatedAt,
-        version: latestContent?.metadata?.version || 'unknown'
+        return res.json({
+          success: true,
+          data: {
+            totalVersions: contentCount,
+            latestUpdate: latestContent?.updatedAt,
+            version: latestContent?.metadata?.version || 'unknown',
+            storage: 'mongodb'
+          }
+        });
+      } catch (mongoError) {
+        console.warn('MongoDB health check failed:', mongoError);
       }
-    });
+    }
+
+    // Check file system fallback
+    try {
+      const fallbackPath = path.join(__dirname, '../../data/content.json');
+      const stats = await fs.stat(fallbackPath);
+      const fileContent = await fs.readFile(fallbackPath, 'utf-8');
+      const jsonContent = JSON.parse(fileContent);
+
+      res.json({
+        success: true,
+        data: {
+          totalVersions: 1,
+          latestUpdate: stats.mtime,
+          version: jsonContent.metadata?.version || 'unknown',
+          storage: 'file'
+        },
+        message: 'Using file system fallback'
+      });
+    } catch (fileError) {
+      res.json({
+        success: true,
+        data: {
+          totalVersions: 0,
+          latestUpdate: null,
+          version: 'default',
+          storage: 'default'
+        },
+        message: 'No stored content, using default structure'
+      });
+    }
   } catch (error) {
-    res.json({
+    res.status(500).json({
       success: false,
-      error: 'Database not available',
-      fallbackAvailable: true
+      error: 'Health check failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });

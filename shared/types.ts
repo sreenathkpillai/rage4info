@@ -7,6 +7,7 @@ export interface ContentItem {
   sources?: string;
   lastUpdated: string;
   order: number;
+  visible?: boolean;
 }
 
 export interface Section {
@@ -16,6 +17,7 @@ export interface Section {
   order: number;
   collapsible: boolean;
   expanded?: boolean;
+  visible?: boolean;
 }
 
 export interface Tab {
@@ -35,10 +37,26 @@ export interface Page {
   theme?: 'light' | 'dark';
 }
 
+export interface LandingPageConfig {
+  heroTitle: string;
+  heroSubtitle: string;
+  caregiverCard: {
+    title: string;
+    description: string;
+    buttonText: string;
+  };
+  careRecipientCard: {
+    title: string;
+    description: string;
+    buttonText: string;
+  };
+}
+
 export interface ContentSchema {
   pages: {
     [pageId: string]: Page;
   };
+  landingPage?: LandingPageConfig;
   metadata?: {
     version: string;
     lastModified: string;

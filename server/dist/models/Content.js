@@ -41,7 +41,8 @@ const ContentItemSchema = new mongoose_1.Schema({
     content: { type: String, required: true },
     sources: { type: String },
     lastUpdated: { type: String, required: true },
-    order: { type: Number, required: true, default: 0 }
+    order: { type: Number, required: true, default: 0 },
+    visible: { type: Boolean, default: true }
 });
 const SectionSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
@@ -49,7 +50,8 @@ const SectionSchema = new mongoose_1.Schema({
     items: [ContentItemSchema],
     order: { type: Number, required: true, default: 0 },
     collapsible: { type: Boolean, default: true },
-    expanded: { type: Boolean, default: false }
+    expanded: { type: Boolean, default: false },
+    visible: { type: Boolean, default: true }
 });
 const TabSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
@@ -66,12 +68,32 @@ const PageSchema = new mongoose_1.Schema({
     tabs: [TabSchema],
     theme: { type: String, enum: ['light', 'dark'], default: 'light' }
 });
+const LandingPageCardSchema = new mongoose_1.Schema({
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    buttonText: { type: String, default: '' }
+}, { _id: false });
+const LandingPageSchema = new mongoose_1.Schema({
+    heroTitle: { type: String, default: 'Welcome to RAGE4INFO' },
+    heroSubtitle: { type: String, default: 'Your comprehensive resource for caregiving information and support' },
+    caregiverCard: { type: LandingPageCardSchema, default: () => ({
+            title: 'INFO4 Caregivers',
+            description: 'Access resources, training materials, and support tools designed specifically for professional and family caregivers.',
+            buttonText: 'Explore Caregiver Resources'
+        }) },
+    careRecipientCard: { type: LandingPageCardSchema, default: () => ({
+            title: 'INFO4 People with Disabilities',
+            description: 'Find information about care options, support services, and resources to help maintain independence and quality of life.',
+            buttonText: 'Explore Care Recipient Resources'
+        }) }
+}, { _id: false });
 const ContentSchema = new mongoose_1.Schema({
     pages: {
         type: Map,
         of: PageSchema,
         required: true
     },
+    landingPage: { type: LandingPageSchema, default: () => ({}) },
     metadata: {
         version: { type: String, default: '2.0.0' },
         lastModified: { type: String, default: () => new Date().toISOString() },

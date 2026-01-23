@@ -4,7 +4,10 @@ import { useContentStore } from '../store/contentStore';
 import ContentDisplay from '../components/ContentDisplay';
 import SearchBar from '../components/SearchBar';
 import TabNavigation from '../components/TabNavigation';
+import MobileTabNav from '../components/MobileTabNav';
+import BackToTop from '../components/BackToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useIsMobile } from '../hooks/useMediaQuery';
 
 export default function CaregiverPage() {
   const {
@@ -14,6 +17,8 @@ export default function CaregiverPage() {
     setCurrentPage,
     currentTabId
   } = useContentStore();
+
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setCurrentPage('caregiver');
@@ -33,7 +38,7 @@ export default function CaregiverPage() {
       <div className="page-header">
         <div className="page-title">
           <User size={32} />
-          <h1>Rage4Info for Care Givers</h1>
+          <h1>{pageData.title || 'Rage4Info for Care Givers'}</h1>
         </div>
         <p className="page-description">
           {pageData.description || 'Comprehensive resources and information for professional and family caregivers.'}
@@ -42,13 +47,19 @@ export default function CaregiverPage() {
 
       <SearchBar />
 
-      <TabNavigation tabs={pageData.tabs} />
+      {isMobile ? (
+        <MobileTabNav tabs={pageData.tabs} />
+      ) : (
+        <TabNavigation tabs={pageData.tabs} />
+      )}
 
       {currentTab && (
         <div className="tab-content">
           <ContentDisplay sections={currentTab.sections} />
         </div>
       )}
+
+      <BackToTop />
     </div>
   );
 }

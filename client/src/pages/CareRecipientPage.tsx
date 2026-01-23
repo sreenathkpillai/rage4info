@@ -4,7 +4,10 @@ import { useContentStore } from '../store/contentStore';
 import ContentDisplay from '../components/ContentDisplay';
 import SearchBar from '../components/SearchBar';
 import TabNavigation from '../components/TabNavigation';
+import MobileTabNav from '../components/MobileTabNav';
+import BackToTop from '../components/BackToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useIsMobile } from '../hooks/useMediaQuery';
 
 export default function CareRecipientPage() {
   const {
@@ -14,6 +17,8 @@ export default function CareRecipientPage() {
     setCurrentPage,
     currentTabId
   } = useContentStore();
+
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setCurrentPage('carerecipient');
@@ -33,7 +38,7 @@ export default function CareRecipientPage() {
       <div className="page-header">
         <div className="page-title">
           <Heart size={32} />
-          <h1>Rage4Info for People with Disabilities</h1>
+          <h1>{pageData.title || 'Rage4Info for People with Disabilities'}</h1>
         </div>
         <p className="page-description">
           {pageData.description || 'Information and support resources for individuals receiving care.'}
@@ -42,13 +47,19 @@ export default function CareRecipientPage() {
 
       <SearchBar />
 
-      <TabNavigation tabs={pageData.tabs} />
+      {isMobile ? (
+        <MobileTabNav tabs={pageData.tabs} />
+      ) : (
+        <TabNavigation tabs={pageData.tabs} />
+      )}
 
       {currentTab && (
         <div className="tab-content">
           <ContentDisplay sections={currentTab.sections} />
         </div>
       )}
+
+      <BackToTop />
     </div>
   );
 }

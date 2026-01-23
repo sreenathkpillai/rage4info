@@ -32,17 +32,50 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// MongoDB connection
+// Track MongoDB connection status
+let isMongoConnected = false;
+
+// MongoDB connection with improved error handling
 const connectDB = async () => {
   try {
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/care-resource-hub';
-    await mongoose.connect(mongoUri);
+
+    // Set connection options for better reliability
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 5000, // 5 second timeout
+      socketTimeoutMS: 45000, // 45 second socket timeout
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      bufferCommands: false, // Disable mongoose buffering
+    });
+
+    isMongoConnected = true;
     console.log('MongoDB connected successfully');
+
+    // Handle connection events
+    mongoose.connection.on('error', (error) => {
+      console.error('MongoDB connection error:', error);
+      isMongoConnected = false;
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.warn('MongoDB disconnected');
+      isMongoConnected = false;
+    });
+
+    mongoose.connection.on('reconnected', () => {
+      console.log('MongoDB reconnected');
+      isMongoConnected = true;
+    });
+
   } catch (error) {
     console.error('MongoDB connection failed:', error);
-    // Don't exit process, allow API to work with fallback
+    console.log('Server will continue with JSON file fallback for data storage');
+    isMongoConnected = false;
   }
 };
+
+// Export connection status checker
+export const isMongoAvailable = () => isMongoConnected && mongoose.connection.readyState === 1;
 
 connectDB();
 
@@ -52,11 +85,14 @@ app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
+  const mongoStatus = isMongoConnected && mongoose.connection.readyState === 1;
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    mongodb: mongoStatus ? 'connected' : 'disconnected',
+    fallbackMode: !mongoStatus,
+    message: mongoStatus ? 'Using MongoDB for data storage' : 'Using JSON file fallback for data storage'
   });
 });
 

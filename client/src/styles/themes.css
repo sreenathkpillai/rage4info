@@ -1,0 +1,95 @@
+/* Theme Override Styles for Text Color */
+
+/* Light Mode Text Color Overrides */
+[data-theme="light"] * {
+  color: #000000 !important;
+}
+
+/* Dark Mode Text Color Overrides */
+[data-theme="dark"] * {
+  color: #ffffff !important;
+}
+
+/* Exceptions for buttons - preserve their intended colors */
+[data-theme="light"] .btn,
+[data-theme="light"] .btn-primary,
+[data-theme="light"] .btn-secondary,
+[data-theme="light"] .btn-success,
+[data-theme="light"] .btn-danger {
+  color: white !important;
+}
+
+[data-theme="dark"] .btn,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .btn-success,
+[data-theme="dark"] .btn-danger {
+  color: white !important;
+}
+
+/* Exceptions for special elements with gradient text */
+[data-theme="light"] .hero-title,
+[data-theme="light"] .header-title h1 {
+  background: var(--brand-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+[data-theme="dark"] .hero-title,
+[data-theme="dark"] .header-title h1 {
+  background: var(--brand-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Exceptions for role card icons to maintain white text on colored backgrounds */
+[data-theme="light"] .role-card-icon,
+[data-theme="dark"] .role-card-icon {
+  color: white !important;
+}
+
+/* Exceptions for modal headers and other special backgrounds */
+[data-theme="light"] .modal-header,
+[data-theme="light"] .nav-link.active,
+[data-theme="light"] .card-header.expanded {
+  color: white !important;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .nav-link.active,
+[data-theme="dark"] .card-header.expanded {
+  color: white !important;
+}
+
+/* Exceptions for modal close button */
+[data-theme="light"] .modal-close,
+[data-theme="dark"] .modal-close {
+  color: white !important;
+}
+
+/* Exceptions for admin link hover state */
+[data-theme="light"] .admin-link:hover,
+[data-theme="dark"] .admin-link:hover {
+  color: white !important;
+}
+
+/* Exceptions for tab buttons when active or hovered */
+[data-theme="light"] .tab-button.active,
+[data-theme="light"] .tab-button:hover,
+[data-theme="dark"] .tab-button.active,
+[data-theme="dark"] .tab-button:hover {
+  color: white !important;
+}
+
+/* Exceptions for footer text to maintain intended muted appearance */
+[data-theme="light"] .footer-content,
+[data-theme="light"] .footer-links span {
+  color: #666666 !important;
+}
+
+[data-theme="dark"] .footer-content,
+[data-theme="dark"] .footer-links span {
+  color: #cccccc !important;
+}

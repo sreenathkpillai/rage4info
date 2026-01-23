@@ -1,0 +1,513 @@
+/* Mobile Responsive Styles for RAGE4INFO Care Hub */
+
+/* Base mobile breakpoint */
+@media (max-width: 768px) {
+  /* Hide desktop tab navigation on mobile */
+  .tab-navigation {
+    display: none !important;
+  }
+
+  /* Show mobile navigation */
+  .mobile-tab-nav {
+    display: block !important;
+  }
+
+  /* Ensure tabs container doesn't scroll horizontally */
+  .tabs-container {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .tabs-list {
+    overflow-x: hidden;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+  }
+
+  /* Content sections - improved spacing */
+  .content-section {
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+
+  /* Content items - better mobile layout */
+  .content-item {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Content item header */
+  .content-item-header {
+    padding: 12px 0;
+    min-height: 44px; /* Minimum touch target size */
+  }
+
+  .content-item-title {
+    font-size: 16px !important;
+    line-height: 1.4;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Stack metadata vertically on mobile */
+  .content-item-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  /* Source and timestamp styling */
+  .content-sources,
+  .content-updated {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  /* Better typography for mobile */
+  .content-item {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .content-item h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .content-item h3 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  /* Section headers */
+  .section-header {
+    padding: 14px 16px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .section-title {
+    flex: 1;
+    margin-right: 12px;
+  }
+
+  .section-title-static h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  /* Expandable content */
+  .expandable-header {
+    padding: 14px 16px;
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .expandable-content {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Search improvements for mobile */
+  .search-container {
+    margin: 16px auto;
+    padding: 0 16px;
+    width: 100%;
+    max-width: none;
+  }
+
+  .search-bar {
+    padding: 14px 16px 14px 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 12px;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .search-icon {
+    left: 28px;
+  }
+
+  /* Info sections */
+  .info-section {
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+
+  .info-header-container {
+    padding: 0 16px;
+  }
+
+  .info-header-container h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .info-header-container p {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Back to top button */
+  .back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .back-to-top:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .back-to-top.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Header adjustments for mobile */
+  .header {
+    padding: 16px;
+    position: relative;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .back-button {
+    position: static;
+    display: inline-flex;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: inherit;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .theme-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 10px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Modal improvements for mobile */
+  .modal-content {
+    width: 95%;
+    max-width: 95vw;
+    margin: 20px;
+    max-height: calc(100vh - 40px);
+    padding: 20px;
+  }
+
+  /* Link styling improvements */
+  .info-link,
+  .content-sources a {
+    word-break: break-word;
+    line-height: 1.4;
+  }
+
+  /* Loading and error states */
+  .no-results {
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  /* Improved focus indicators for touch devices */
+  .content-item-header:focus,
+  .section-header:focus,
+  .expandable-header:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+}
+
+/* Small mobile devices (iPhone SE, etc.) */
+@media (max-width: 480px) {
+  .content-section {
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+
+  .content-item {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .content-item-title {
+    font-size: 15px !important;
+  }
+
+  .content-item {
+    font-size: 13px;
+  }
+
+  .search-container {
+    padding: 0 12px;
+    margin: 12px auto;
+  }
+
+  .search-bar {
+    padding: 12px 14px 12px 40px;
+    font-size: 16px;
+  }
+
+  .search-icon {
+    left: 24px;
+  }
+
+  .section-header,
+  .expandable-header {
+    padding: 12px 14px;
+  }
+
+  .expandable-content {
+    padding: 14px;
+  }
+
+  .info-section {
+    padding: 14px;
+  }
+
+  .header {
+    padding: 12px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .back-to-top {
+    bottom: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .modal-content {
+    padding: 16px;
+  }
+
+  /* Smaller buttons for very small screens */
+  .mobile-tab-button {
+    padding: 10px 14px;
+    min-height: 42px;
+  }
+
+  .mobile-tab-option {
+    padding: 10px 14px;
+    min-height: 42px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .content-section {
+    padding: 6px;
+    margin-bottom: 10px;
+  }
+
+  .content-item {
+    padding: 10px;
+    margin-bottom: 6px;
+  }
+
+  .content-item-title {
+    font-size: 14px !important;
+  }
+
+  .search-container {
+    padding: 0 8px;
+    margin: 10px auto;
+  }
+
+  .info-section {
+    padding: 12px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .back-button {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
+
+/* Desktop styles - hide mobile navigation */
+@media (min-width: 769px) {
+  .mobile-tab-nav {
+    display: none !important;
+  }
+
+  /* Show desktop tab navigation */
+  .tab-navigation {
+    display: flex !important;
+  }
+
+  .back-to-top {
+    display: none; /* Only show on mobile */
+  }
+}
+
+/* High density displays */
+@media (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
+  .content-item {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+
+  .mobile-tab-dropdown {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .header {
+    padding: 12px 16px;
+  }
+
+  .content-section {
+    margin-bottom: 12px;
+  }
+
+  .back-to-top {
+    bottom: 12px;
+    right: 12px;
+  }
+}
+
+/* Dark mode mobile adjustments */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+  .content-item {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-tab-dropdown {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .back-to-top {
+    background-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Print styles for mobile */
+@media print {
+  .mobile-tab-nav,
+  .back-to-top,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  .content-item-footer {
+    flex-direction: row !important;
+    gap: 16px !important;
+  }
+}
+
+/* Focus management for touch devices */
+@media (max-width: 768px) {
+  /* Remove focus outline on touch devices unless using keyboard */
+  .js-focus-visible .content-item-header:focus:not(.focus-visible),
+  .js-focus-visible .section-header:focus:not(.focus-visible),
+  .js-focus-visible .mobile-tab-button:focus:not(.focus-visible) {
+    outline: none;
+  }
+
+  /* Enhanced focus for keyboard navigation */
+  .content-item-header.focus-visible,
+  .section-header.focus-visible,
+  .mobile-tab-button.focus-visible {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+  }
+}
+
+/* Animation optimizations for mobile */
+@media (max-width: 768px) {
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-tab-dropdown,
+    .content-item-body,
+    .section-content {
+      transition: none;
+    }
+
+    .back-to-top {
+      transition: background-color 0.2s ease;
+    }
+  }
+
+  /* Optimize animations for 60fps on mobile */
+  .mobile-tab-dropdown.is-open {
+    will-change: transform, opacity;
+  }
+
+  .content-item-body.expanded,
+  .section-content.expanded {
+    will-change: max-height;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .search-bar {
+      -webkit-appearance: none;
+      border-radius: 12px;
+    }
+
+    .mobile-tab-button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .content-item-header {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+}

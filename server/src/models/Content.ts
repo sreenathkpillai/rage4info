@@ -8,6 +8,7 @@ interface IContentItem {
   sources?: string;
   lastUpdated: string;
   order: number;
+  visible?: boolean;
 }
 
 // Interface for Section
@@ -18,6 +19,7 @@ interface ISection {
   order: number;
   collapsible: boolean;
   expanded?: boolean;
+  visible?: boolean;
 }
 
 // Interface for Tab
@@ -39,11 +41,28 @@ interface IPage {
   theme?: 'light' | 'dark';
 }
 
+// Interface for Landing Page Config
+interface ILandingPageConfig {
+  heroTitle: string;
+  heroSubtitle: string;
+  caregiverCard: {
+    title: string;
+    description: string;
+    buttonText: string;
+  };
+  careRecipientCard: {
+    title: string;
+    description: string;
+    buttonText: string;
+  };
+}
+
 // Interface for the main Content document
 export interface IContentDocument extends Document {
   pages: {
     [pageId: string]: IPage;
   };
+  landingPage?: ILandingPageConfig;
   metadata?: {
     version: string;
     lastModified: string;
@@ -60,7 +79,8 @@ const ContentItemSchema = new Schema<IContentItem>({
   content: { type: String, required: true },
   sources: { type: String },
   lastUpdated: { type: String, required: true },
-  order: { type: Number, required: true, default: 0 }
+  order: { type: Number, required: true, default: 0 },
+  visible: { type: Boolean, default: true }
 });
 
 const SectionSchema = new Schema<ISection>({
@@ -69,7 +89,8 @@ const SectionSchema = new Schema<ISection>({
   items: [ContentItemSchema],
   order: { type: Number, required: true, default: 0 },
   collapsible: { type: Boolean, default: true },
-  expanded: { type: Boolean, default: false }
+  expanded: { type: Boolean, default: false },
+  visible: { type: Boolean, default: true }
 });
 
 const TabSchema = new Schema<ITab>({
@@ -89,12 +110,34 @@ const PageSchema = new Schema<IPage>({
   theme: { type: String, enum: ['light', 'dark'], default: 'light' }
 });
 
+const LandingPageCardSchema = new Schema({
+  title: { type: String, default: '' },
+  description: { type: String, default: '' },
+  buttonText: { type: String, default: '' }
+}, { _id: false });
+
+const LandingPageSchema = new Schema({
+  heroTitle: { type: String, default: 'Welcome to RAGE4INFO' },
+  heroSubtitle: { type: String, default: 'Your comprehensive resource for caregiving information and support' },
+  caregiverCard: { type: LandingPageCardSchema, default: () => ({
+    title: 'INFO4 Caregivers',
+    description: 'Access resources, training materials, and support tools designed specifically for professional and family caregivers.',
+    buttonText: 'Explore Caregiver Resources'
+  })},
+  careRecipientCard: { type: LandingPageCardSchema, default: () => ({
+    title: 'INFO4 People with Disabilities',
+    description: 'Find information about care options, support services, and resources to help maintain independence and quality of life.',
+    buttonText: 'Explore Care Recipient Resources'
+  })}
+}, { _id: false });
+
 const ContentSchema = new Schema<IContentDocument>({
   pages: {
     type: Map,
     of: PageSchema,
     required: true
   },
+  landingPage: { type: LandingPageSchema, default: () => ({}) },
   metadata: {
     version: { type: String, default: '2.0.0' },
     lastModified: { type: String, default: () => new Date().toISOString() },

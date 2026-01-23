@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ContentSchema, Tab, Section, ContentItem } from '../../../shared/types';
+import type { ContentSchema, Tab, Section, ContentItem, LandingPageConfig } from '../../../shared/types';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -26,20 +26,20 @@ interface ContentState {
   addTab: (pageId: string, tab: Tab) => Promise<void>;
   updateTab: (pageId: string, tabId: string, updates: Partial<Tab>) => Promise<void>;
   deleteTab: (pageId: string, tabId: string) => Promise<void>;
-  reorderTabs: (pageId: string, tabIds: string[]) => Promise<void>;
+  reorderTabs: (pageId: string, dragIndex: number, hoverIndex: number) => Promise<void>;
 
   addSection: (pageId: string, tabId: string, section: Section) => Promise<void>;
   updateSection: (pageId: string, tabId: string, sectionId: string, updates: Partial<Section>) => Promise<void>;
   deleteSection: (pageId: string, tabId: string, sectionId: string) => Promise<void>;
-  reorderSections: (pageId: string, tabId: string, sectionIds: string[]) => Promise<void>;
+  reorderSections: (pageId: string, tabId: string, dragIndex: number, hoverIndex: number) => Promise<void>;
 
   addContentItem: (pageId: string, tabId: string, sectionId: string, item: ContentItem) => Promise<void>;
   updateContentItem: (pageId: string, tabId: string, sectionId: string, itemId: string, updates: Partial<ContentItem>) => Promise<void>;
   deleteContentItem: (pageId: string, tabId: string, sectionId: string, itemId: string) => Promise<void>;
-  reorderContentItems: (pageId: string, tabId: string, sectionId: string, itemIds: string[]) => Promise<void>;
+  reorderContentItems: (pageId: string, tabId: string, sectionId: string, dragIndex: number, hoverIndex: number) => Promise<void>;
 
-  // Section expand/collapse
-  toggleSection: (sectionId: string) => void;
+  // Landing page operations
+  updateLandingPage: (updates: Partial<LandingPageConfig>) => Promise<void>;
 }
 
 export const useContentStore = create<ContentState>((set, get) => ({
@@ -173,20 +173,28 @@ export const useContentStore = create<ContentState>((set, get) => ({
     set({ content: { ...content } });
   },
 
-  reorderTabs: async (pageId: string, tabIds: string[]) => {
+  reorderTabs: async (pageId: string, dragIndex: number, hoverIndex: number) => {
     const content = get().content;
     if (!content) return;
 
     const page = content.pages[pageId];
     if (!page) return;
 
-    const reorderedTabs = tabIds.map((id, index) => {
-      const tab = page.tabs.find(t => t.id === id);
-      if (tab) tab.order = index;
-      return tab;
-    }).filter(Boolean) as Tab[];
+    const tabs = [...page.tabs];
+    const draggedTab = tabs[dragIndex];
 
-    page.tabs = reorderedTabs;
+    // Remove the dragged tab from its original position
+    tabs.splice(dragIndex, 1);
+
+    // Insert it at the new position
+    tabs.splice(hoverIndex, 0, draggedTab);
+
+    // Update order for all tabs
+    tabs.forEach((tab, index) => {
+      tab.order = index;
+    });
+
+    page.tabs = tabs;
     await get().saveContent(content);
     set({ content: { ...content } });
   },
@@ -240,7 +248,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
     set({ content: { ...content } });
   },
 
-  reorderSections: async (pageId: string, tabId: string, sectionIds: string[]) => {
+  reorderSections: async (pageId: string, tabId: string, dragIndex: number, hoverIndex: number) => {
     const content = get().content;
     if (!content) return;
 
@@ -250,13 +258,21 @@ export const useContentStore = create<ContentState>((set, get) => ({
     const tab = page.tabs.find(t => t.id === tabId);
     if (!tab) return;
 
-    const reorderedSections = sectionIds.map((id, index) => {
-      const section = tab.sections.find(s => s.id === id);
-      if (section) section.order = index;
-      return section;
-    }).filter(Boolean) as Section[];
+    const sections = [...tab.sections];
+    const draggedSection = sections[dragIndex];
 
-    tab.sections = reorderedSections;
+    // Remove the dragged section from its original position
+    sections.splice(dragIndex, 1);
+
+    // Insert it at the new position
+    sections.splice(hoverIndex, 0, draggedSection);
+
+    // Update order for all sections
+    sections.forEach((section, index) => {
+      section.order = index;
+    });
+
+    tab.sections = sections;
     await get().saveContent(content);
     set({ content: { ...content } });
   },
@@ -296,7 +312,11 @@ export const useContentStore = create<ContentState>((set, get) => ({
     const itemIndex = section.items.findIndex(i => i.id === itemId);
     if (itemIndex === -1) return;
 
-    section.items[itemIndex] = { ...section.items[itemIndex], ...updates };
+    section.items[itemIndex] = {
+      ...section.items[itemIndex],
+      ...updates,
+      lastUpdated: new Date().toISOString()
+    };
     await get().saveContent(content);
     set({ content: { ...content } });
   },
@@ -319,7 +339,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
     set({ content: { ...content } });
   },
 
-  reorderContentItems: async (pageId: string, tabId: string, sectionId: string, itemIds: string[]) => {
+  reorderContentItems: async (pageId: string, tabId: string, sectionId: string, dragIndex: number, hoverIndex: number) => {
     const content = get().content;
     if (!content) return;
 
@@ -332,38 +352,67 @@ export const useContentStore = create<ContentState>((set, get) => ({
     const section = tab.sections.find(s => s.id === sectionId);
     if (!section) return;
 
-    const reorderedItems = itemIds.map((id, index) => {
-      const item = section.items.find(i => i.id === id);
-      if (item) item.order = index;
-      return item;
-    }).filter(Boolean) as ContentItem[];
+    const items = [...section.items];
+    const draggedItem = items[dragIndex];
 
-    section.items = reorderedItems;
+    // Remove the dragged item from its original position
+    items.splice(dragIndex, 1);
+
+    // Insert it at the new position
+    items.splice(hoverIndex, 0, draggedItem);
+
+    // Update order for all items
+    items.forEach((item, index) => {
+      item.order = index;
+    });
+
+    section.items = items;
     await get().saveContent(content);
     set({ content: { ...content } });
   },
 
-  toggleSection: (sectionId: string) => {
+  // Update landing page configuration
+  updateLandingPage: async (updates: Partial<LandingPageConfig>) => {
     const content = get().content;
     if (!content) return;
 
-    const currentPageId = get().currentPageId;
-    const currentTabId = get().currentTabId;
+    const currentLandingPage = content.landingPage || {
+      heroTitle: 'Welcome to RAGE4INFO',
+      heroSubtitle: 'Your comprehensive resource for caregiving information and support',
+      caregiverCard: {
+        title: 'INFO4 Caregivers',
+        description: 'Access resources, training materials, and support tools designed specifically for professional and family caregivers.',
+        buttonText: 'Explore Caregiver Resources'
+      },
+      careRecipientCard: {
+        title: 'INFO4 People with Disabilities',
+        description: 'Find information about care options, support services, and resources to help maintain independence and quality of life.',
+        buttonText: 'Explore Care Recipient Resources'
+      }
+    };
 
-    if (!currentTabId) return;
+    const updatedLandingPage = {
+      ...currentLandingPage,
+      ...updates,
+      caregiverCard: {
+        ...currentLandingPage.caregiverCard,
+        ...(updates.caregiverCard || {})
+      },
+      careRecipientCard: {
+        ...currentLandingPage.careRecipientCard,
+        ...(updates.careRecipientCard || {})
+      }
+    };
 
-    const page = content.pages[currentPageId];
-    if (!page) return;
+    const updatedContent = {
+      ...content,
+      landingPage: updatedLandingPage
+    };
 
-    const tab = page.tabs.find(t => t.id === currentTabId);
-    if (!tab) return;
+    await get().saveContent(updatedContent);
+    set({ content: updatedContent });
+  },
 
-    const section = tab.sections.find(s => s.id === sectionId);
-    if (section) {
-      section.expanded = !section.expanded;
-      set({ content: { ...content } });
-    }
-  }
 }));
 
 // Helper function to transform old content format to new format

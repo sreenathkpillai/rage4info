@@ -347,6 +347,51 @@ a:hover {
   display: none;
 }
 
+/* Tab scroll arrows */
+.tabs-with-arrows {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+}
+
+.scroll-arrow:hover {
+  background: var(--brand-primary);
+  color: white;
+  border-color: var(--brand-primary);
+}
+
+.scroll-arrow-left {
+  left: -12px;
+}
+
+.scroll-arrow-right {
+  right: -12px;
+}
+
+.tabs-with-arrows .tabs-list {
+  flex: 1;
+  margin: 0 8px;
+}
+
 .tab-button {
   flex-shrink: 0;
   padding: var(--spacing-md) var(--spacing-lg);
@@ -520,30 +565,69 @@ a:hover {
   margin-bottom: var(--spacing-sm);
 }
 
+/* Force link styling in content (override TinyMCE inline styles) */
+.content-item-body a {
+  color: var(--accent-blue) !important;
+  text-decoration: underline !important;
+  font-weight: normal !important;
+}
+
+.content-item-body a:hover {
+  color: var(--brand-secondary) !important;
+}
+
+/* Dark theme link styling */
+[data-theme="dark"] .content-item-body a {
+  color: var(--brand-primary) !important;
+}
+
+[data-theme="dark"] .content-item-body a:hover {
+  color: var(--accent-blue) !important;
+}
+
 .content-item-footer {
   margin-top: var(--spacing-lg);
   padding-top: var(--spacing-md);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
   font-size: 0.875rem;
   color: var(--text-muted);
 }
 
 .content-sources {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.content-sources svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.content-sources span {
+  word-break: break-word;
 }
 
 .content-sources a {
   color: var(--accent-blue);
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .content-updated {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: auto;
+  flex-shrink: 0;
   font-style: italic;
+  white-space: nowrap;
 }
 
 /* Buttons */
