@@ -121,7 +121,7 @@ a:hover {
 
 /* Layout Components */
 .app-container {
-  min-height: 100vh;
+  /* min-height removed - iframe parent controls sizing */
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -267,6 +267,23 @@ a:hover {
 
 .footer-links span {
   color: var(--text-muted);
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.footer-social a {
+  color: var(--text-muted);
+  transition: color var(--transition-base), transform var(--transition-base);
+}
+
+.footer-social a:hover {
+  color: var(--brand-primary);
+  transform: scale(1.1);
 }
 
 /* Page Container */

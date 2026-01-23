@@ -9,5 +9,20 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Communicate iframe height to parent (WordPress)
+      let resizeTimeout;
+      function postHeight() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          const height = document.body.scrollHeight;
+          window.parent.postMessage({ type: 'resize', height: height }, '*');
+        }, 100);
+      }
+      window.addEventListener('load', () => {
+        postHeight();
+        new ResizeObserver(postHeight).observe(document.body);
+      });
+    </script>
   </body>
 </html>

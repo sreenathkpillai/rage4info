@@ -78,21 +78,7 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* Footer */}
-      <footer className="app-footer">
-        <div className="footer-content">
-          <p>&copy; 2025 RAGE4INFO v2.0</p>
-          <p className="footer-links">
-            <Link to="/">Home</Link>
-            <span>•</span>
-            <Link to="/admin">Admin</Link>
-            <span>•</span>
-            <a href="#privacy">Privacy</a>
-            <span>•</span>
-            <a href="#terms">Terms</a>
-          </p>
-        </div>
-      </footer>
+{/* Footer removed - using WordPress footer instead */}
     </div>
   );
 }
