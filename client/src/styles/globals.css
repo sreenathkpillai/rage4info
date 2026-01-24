@@ -136,15 +136,42 @@ a:hover {
   box-shadow: var(--shadow-sm);
 }
 
+/* Header layout */
 .header-content {
   max-width: 1024px;
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-md) var(--spacing-lg);
   display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Row 1: Title centered, Theme Toggle right */
+.header-row-1 {
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-lg);
+  justify-content: center;
+  position: relative;
+  min-height: 44px;
+}
+
+.header-title {
+  text-decoration: none;
+}
+
+.header-row-1 .back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.header-row-1 .theme-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .header-title h1 {
@@ -156,15 +183,61 @@ a:hover {
   background-clip: text;
 }
 
-.header-actions {
+/* Row 2: Navigation links centered */
+.header-nav {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  justify-content: center;
+  gap: var(--spacing-sm);
 }
 
-.page-nav {
+/* Invisible placeholder for grid spacing on home page */
+.back-button-placeholder {
+  background: transparent;
+  cursor: default;
+}
+
+/* Icon buttons - all icon-only buttons share the same base */
+.back-button,
+.back-button-placeholder,
+.theme-toggle,
+.admin-link {
   display: flex;
-  gap: var(--spacing-sm);
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.back-button:hover,
+.theme-toggle:hover,
+.admin-link:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Hide "Back" text - icon only */
+.back-button span {
+  display: none;
+}
+
+/* Adjust back button vertical position */
+.back-button {
+  margin-top: 4px;
 }
 
 .nav-link {
@@ -184,53 +257,6 @@ a:hover {
 }
 
 .nav-link.active {
-  background: var(--brand-gradient);
-  color: white;
-}
-
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  transition: all var(--transition-fast);
-}
-
-.back-button:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.theme-toggle {
-  background: var(--bg-tertiary);
-  border: none;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-}
-
-.theme-toggle:hover {
-  background: var(--border-color);
-}
-
-.admin-link {
-  background: var(--bg-tertiary);
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  transition: all var(--transition-fast);
-}
-
-.admin-link:hover {
   background: var(--brand-gradient);
   color: white;
 }
@@ -602,6 +628,13 @@ a:hover {
   color: var(--accent-blue) !important;
 }
 
+.content-item-body h3 {
+  padding-top: 7px;
+  font-size: 1.2em;
+  line-height: 1.2em;
+  margin-bottom: 8px;
+}
+
 .content-item-footer {
   margin-top: var(--spacing-lg);
   padding-top: var(--spacing-md);
@@ -921,21 +954,45 @@ select.form-control {
 .hidden { display: none; }
 .visible { display: block; }
 
-/* Responsive */
+/* Responsive - Mobile adjustments */
 @media (max-width: 768px) {
   .app-main {
     padding: var(--spacing-lg) var(--spacing-md);
   }
 
   .header-content {
-    flex-wrap: wrap;
+    padding: var(--spacing-sm) var(--spacing-md);
     gap: var(--spacing-md);
   }
 
-  .page-nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
+  /* Row 1: ensure proper height on mobile */
+  .header-row-1 {
+    min-height: 40px;
+  }
+
+  .theme-toggle,
+  .admin-link {
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
+  }
+
+  .header-title h1 {
+    font-size: 1.25rem;
+  }
+
+  .nav-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+
+  .nav-link svg {
+    width: 16px;
+    height: 16px;
   }
 
   .tabs-list {

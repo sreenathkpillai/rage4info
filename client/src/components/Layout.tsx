@@ -15,46 +15,18 @@ export default function Layout() {
       {/* Navigation Header */}
       <header className="app-header">
         <div className="header-content">
-          {/* Back Button */}
-          {!isHomePage && (
-            <Link to="/" className="back-button">
-              <ArrowLeft size={20} />
-              <span>Back</span>
-            </Link>
-          )}
-
-          {/* Logo/Title */}
-          <div className="header-title">
-            <h1>RAGE4INFO</h1>
-          </div>
-
-          {/* Right Actions */}
-          <div className="header-actions">
-            {/* Page Links */}
-            {!isAdminPage && (
-              <nav className="page-nav">
-                <Link
-                  to="/caregiver"
-                  className={clsx('nav-link', {
-                    active: location.pathname === '/caregiver'
-                  })}
-                >
-                  <User size={18} />
-                  <span>Caregiver</span>
-                </Link>
-                <Link
-                  to="/care-recipient"
-                  className={clsx('nav-link', {
-                    active: location.pathname === '/care-recipient'
-                  })}
-                >
-                  <Heart size={18} />
-                  <span>Care Recipient</span>
-                </Link>
-              </nav>
+          {/* Row 1: Back button left, Title centered, Theme Toggle right */}
+          <div className="header-row-1">
+            {!isHomePage && (
+              <Link to="/" className="back-button" aria-label="Go back home">
+                <ArrowLeft size={20} />
+              </Link>
             )}
 
-            {/* Theme Toggle */}
+            <Link to="/" className="header-title">
+              <h1>RAGE4INFO</h1>
+            </Link>
+
             <button
               onClick={toggleTheme}
               className="theme-toggle"
@@ -62,14 +34,34 @@ export default function Layout() {
             >
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
+          </div>
 
-            {/* Admin Link */}
-            {!isAdminPage && (
+          {/* Row 2: Navigation group (centered) */}
+          {!isAdminPage && (
+            <div className="header-nav">
               <Link to="/admin" className="admin-link">
                 <Settings size={18} />
               </Link>
-            )}
-          </div>
+              <Link
+                to="/caregiver"
+                className={clsx('nav-link', {
+                  active: location.pathname === '/caregiver'
+                })}
+              >
+                <User size={18} />
+                <span>Caregiver</span>
+              </Link>
+              <Link
+                to="/care-recipient"
+                className={clsx('nav-link', {
+                  active: location.pathname === '/care-recipient'
+                })}
+              >
+                <Heart size={18} />
+                <span>Care Recipient</span>
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 

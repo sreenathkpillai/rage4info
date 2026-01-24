@@ -15,14 +15,21 @@
       function postHeight() {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-          const height = document.body.scrollHeight;
+          const root = document.getElementById('root');
+          const height = root ? root.scrollHeight : document.body.scrollHeight;
           window.parent.postMessage({ type: 'resize', height: height }, '*');
-        }, 100);
+        }, 50);
       }
       window.addEventListener('load', () => {
         postHeight();
-        new ResizeObserver(postHeight).observe(document.body);
+        const root = document.getElementById('root');
+        if (root) {
+          new MutationObserver(postHeight).observe(root, { childList: true, subtree: true });
+          new ResizeObserver(postHeight).observe(root);
+        }
       });
+      // Catch route changes
+      window.addEventListener('popstate', postHeight);
     </script>
   </body>
 </html>

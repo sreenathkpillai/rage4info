@@ -230,6 +230,12 @@ export default function HomePage() {
           .hero-title {
             font-size: 2rem;
           }
+
+          .role-card-title {
+            white-space: normal;
+            font-size: 1.35rem;
+            line-height: 1.3;
+          }
         }
       `}</style>
     </div>

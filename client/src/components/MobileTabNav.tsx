@@ -152,10 +152,10 @@ export default function MobileTabNav({ tabs }: MobileTabNavProps) {
           width: 100%;
           min-height: 44px;
           padding: 12px 16px;
-          border: 2px solid #000000;
+          border: 2px solid var(--border-color);
           border-radius: 8px;
-          background-color: #ffffff;
-          color: #000000;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
           font-size: 16px;
           font-weight: 500;
           cursor: pointer;
@@ -164,18 +164,18 @@ export default function MobileTabNav({ tabs }: MobileTabNavProps) {
         }
 
         .mobile-tab-button:hover {
-          background-color: #f8f9fa;
-          border-color: #666666;
+          background-color: var(--bg-secondary);
+          border-color: var(--text-muted);
         }
 
         .mobile-tab-button:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+          border-color: var(--brand-primary);
+          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
         }
 
         .mobile-tab-button.is-open {
-          border-color: #007bff;
-          background-color: #f8f9fa;
+          border-color: var(--brand-primary);
+          background-color: var(--bg-secondary);
         }
 
         .mobile-tab-button-content {
@@ -200,7 +200,7 @@ export default function MobileTabNav({ tabs }: MobileTabNavProps) {
         .mobile-tab-chevron {
           display: flex;
           align-items: center;
-          color: #666666;
+          color: var(--text-muted);
           transition: transform 0.2s ease;
         }
 
@@ -213,8 +213,8 @@ export default function MobileTabNav({ tabs }: MobileTabNavProps) {
           top: calc(100% + 4px);
           left: 0;
           right: 0;
-          background-color: #ffffff;
-          border: 1px solid #e0e0e0;
+          background-color: var(--bg-primary);
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           z-index: 1000;
@@ -239,14 +239,14 @@ export default function MobileTabNav({ tabs }: MobileTabNavProps) {
           min-height: 44px;
           padding: 12px 16px;
           border: none;
-          background-color: #ffffff;
-          color: #333333;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
           font-size: 16px;
           text-align: left;
           cursor: pointer;
           transition: background-color 0.15s ease;
           outline: none;
-          border-bottom: 1px solid #f0f0f0;
+          border-bottom: 1px solid var(--border-color);
         }
 
         .mobile-tab-option:last-child {
@@ -254,17 +254,17 @@ export default function MobileTabNav({ tabs }: MobileTabNavProps) {
         }
 
         .mobile-tab-option:hover {
-          background-color: #f8f9fa;
+          background-color: var(--bg-secondary);
         }
 
         .mobile-tab-option:focus {
-          background-color: #e3f2fd;
-          box-shadow: inset 2px 0 0 #007bff;
+          background-color: var(--bg-tertiary);
+          box-shadow: inset 2px 0 0 var(--brand-primary);
         }
 
         .mobile-tab-option.is-current {
-          background-color: #e3f2fd;
-          color: #007bff;
+          background-color: var(--bg-tertiary);
+          color: var(--brand-primary);
           font-weight: 600;
         }
 
