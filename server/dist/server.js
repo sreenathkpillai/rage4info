@@ -16,6 +16,10 @@ const auth_1 = __importDefault(require("./routes/auth"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
+// Production runs behind Apache's reverse proxy (one hop): trust its
+// X-Forwarded-For so rate limiting keys on the real client IP instead of
+// lumping every visitor into the proxy's 127.0.0.1 bucket.
+app.set('trust proxy', 1);
 // Security middleware
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)({

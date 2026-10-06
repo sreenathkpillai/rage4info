@@ -13,6 +13,7 @@ import type { Tab, Section, ContentItem, LandingPageConfig } from '../../../shar
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 import { useAutoSave } from '../hooks/useAutoSave';
 import DraggableTreeItem from '../components/DraggableTreeItem';
+import { mergeLandingPage, LANDING_ICON_NAMES, LandingIcon, iconLabel } from '../utils/landingIcons';
 import '../styles/admin-v2.css';
 
 type SelectedItem = {
@@ -26,6 +27,7 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const {
     content,
+    error: storeError,
     saveContent,
     addTab,
     updateTab,
@@ -50,24 +52,11 @@ export default function AdminPage() {
   const [isLoadingItem, setIsLoadingItem] = useState(false);
   const [landingPageData, setLandingPageData] = useState<LandingPageConfig | null>(null);
 
-  // Initialize landing page data when content loads or page changes
+  // Initialize landing page data when content loads or page changes.
+  // Older saved data may predate the icon/feature fields, so merge with defaults.
   useEffect(() => {
     if (selectedPage === 'landing' && content) {
-      const defaultLanding: LandingPageConfig = {
-        heroTitle: 'Welcome to RAGE4INFO',
-        heroSubtitle: 'Your comprehensive resource for caregiving information and support',
-        caregiverCard: {
-          title: 'INFO4 Caregivers',
-          description: 'Access resources, training materials, and support tools designed specifically for professional and family caregivers.',
-          buttonText: 'Explore Caregiver Resources'
-        },
-        careRecipientCard: {
-          title: 'INFO4 People with Disabilities',
-          description: 'Find information about care options, support services, and resources to help maintain independence and quality of life.',
-          buttonText: 'Explore Care Recipient Resources'
-        }
-      };
-      setLandingPageData(content.landingPage || defaultLanding);
+      setLandingPageData(mergeLandingPage(content.landingPage));
     }
   }, [selectedPage, content]);
 
@@ -82,26 +71,26 @@ export default function AdminPage() {
       switch (selectedItem.type) {
         case 'tab':
           if (currentPageData.tabs.find(t => t.id === editingData.id)) {
-            updateTab(selectedPage, editingData.id, editingData);
+            await updateTab(selectedPage, editingData.id, editingData);
           } else {
-            addTab(selectedPage, editingData);
+            await addTab(selectedPage, editingData);
           }
           break;
         case 'section':
           if (selectedItem.tabId) {
             if (currentPageData.tabs.find(t => t.id === selectedItem.tabId)?.sections.find(s => s.id === editingData.id)) {
-              updateSection(selectedPage, selectedItem.tabId, editingData.id, editingData);
+              await updateSection(selectedPage, selectedItem.tabId, editingData.id, editingData);
             } else {
-              addSection(selectedPage, selectedItem.tabId, editingData);
+              await addSection(selectedPage, selectedItem.tabId, editingData);
             }
           }
           break;
         case 'item':
           if (selectedItem.tabId && selectedItem.sectionId) {
             if (currentPageData.tabs.find(t => t.id === selectedItem.tabId)?.sections.find(s => s.id === selectedItem.sectionId)?.items.find(i => i.id === editingData.id)) {
-              updateContentItem(selectedPage, selectedItem.tabId, selectedItem.sectionId, editingData.id, editingData);
+              await updateContentItem(selectedPage, selectedItem.tabId, selectedItem.sectionId, editingData.id, editingData);
             } else {
-              addContentItem(selectedPage, selectedItem.tabId, selectedItem.sectionId, editingData);
+              await addContentItem(selectedPage, selectedItem.tabId, selectedItem.sectionId, editingData);
             }
           }
           break;
@@ -112,13 +101,26 @@ export default function AdminPage() {
     }
   }, [selectedItem, editingData, selectedPage, content, updateTab, addTab, updateSection, addSection, updateContentItem, addContentItem]);
 
-  const { saveStatus, hasChanges } = useAutoSave(
+  const { saveStatus, hasChanges, manualSave } = useAutoSave(
     saveCurrentItem,
     editingData,
     2000
   );
 
-  useUnsavedChanges(hasChanges);
+  // Landing page edits are debounced the same way as item edits.
+  // useAutoSave only calls this when the data actually changed.
+  const saveLandingPage = useCallback(async () => {
+    if (!landingPageData) return;
+    await updateLandingPage(landingPageData);
+  }, [landingPageData, updateLandingPage]);
+
+  const { saveStatus: landingSaveStatus, hasChanges: landingHasChanges, manualSave: landingManualSave } = useAutoSave(
+    saveLandingPage,
+    landingPageData,
+    2000
+  );
+
+  useUnsavedChanges(hasChanges || landingHasChanges);
 
 
   // Handle item selection
@@ -229,13 +231,22 @@ export default function AdminPage() {
   // Check authentication
   useEffect(() => {
     const isAdmin = localStorage.getItem('isAdmin');
-    if (!isAdmin) {
+    const authToken = localStorage.getItem('authToken');
+    if (!isAdmin || !authToken) {
       navigate('/login');
     }
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Flush any edit still waiting in the autosave debounce window
+    try {
+      await manualSave();
+      await landingManualSave();
+    } catch {
+      // save errors are already surfaced in the status bar
+    }
     localStorage.removeItem('isAdmin');
+    localStorage.removeItem('authToken');
     navigate('/');
   };
 
@@ -256,23 +267,32 @@ export default function AdminPage() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
+      let importedContent: any;
       try {
-        const importedContent = JSON.parse(event.target?.result as string);
-        saveContent(importedContent);
+        importedContent = JSON.parse(event.target?.result as string);
+      } catch {
+        alert('Failed to import: this is not a valid JSON file.');
+        return;
+      }
+
+      if (!importedContent || typeof importedContent.pages !== 'object' || Array.isArray(importedContent.pages)) {
+        alert('Failed to import: this file is not a RAGE4INFO content backup (missing "pages").');
+        return;
+      }
+
+      const saved = await saveContent(importedContent);
+      if (saved) {
         alert('Content imported successfully!');
-      } catch (error) {
-        alert('Failed to import content. Please check the file format.');
+      } else {
+        alert('Import could not be saved to the server (your login may have expired). Log out, log back in, and try again.');
       }
     };
     reader.readAsText(file);
   };
 
-  if (!content) return <div>Loading...</div>;
-
   // For landing page, we don't need pageData
-  const pageData = selectedPage !== 'landing' ? content.pages[selectedPage] : null;
-  if (selectedPage !== 'landing' && !pageData) return <div>Page not found</div>;
+  const pageData = content && selectedPage !== 'landing' ? content.pages[selectedPage] : null;
 
   // Filter content based on search term (only for non-landing pages)
   const filteredContent = useMemo(() => {
@@ -303,6 +323,9 @@ export default function AdminPage() {
 
     return { ...pageData, tabs: filteredTabs };
   }, [pageData, searchTerm]);
+
+  if (!content) return <div>Loading...</div>;
+  if (selectedPage !== 'landing' && !pageData) return <div>Page not found</div>;
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -555,15 +578,13 @@ export default function AdminPage() {
                   <Edit3 size={20} style={{ marginRight: '8px' }} />
                   Landing Page
                 </h2>
+                <SaveStatus status={landingSaveStatus || 'saved'} />
               </div>
               <div className="editor-body">
                 {landingPageData && (
                   <LandingPageEditor
                     data={landingPageData}
-                    onChange={(updates) => {
-                      setLandingPageData(updates);
-                      updateLandingPage(updates);
-                    }}
+                    onChange={setLandingPageData}
                   />
                 )}
               </div>
@@ -615,24 +636,30 @@ export default function AdminPage() {
 
         {/* Save status toast */}
         {(() => {
+          const activeStatus = selectedPage === 'landing' ? landingSaveStatus : saveStatus;
+          const activeHasChanges = selectedPage === 'landing' ? landingHasChanges : hasChanges;
+
           let toastType = 'idle';
           let toastContent = '';
 
-          if (isLoadingItem) {
+          if (storeError) {
+            toastType = 'error';
+            toastContent = `⚠ ${storeError}`;
+          } else if (isLoadingItem) {
             toastType = 'loading';
             toastContent = '⟳ Loading...';
-          } else if (saveStatus === 'saving') {
+          } else if (activeStatus === 'saving') {
             toastType = 'saving';
-            toastContent = '⟳ Saving...';
-          } else if (saveStatus === 'error') {
+            toastContent = '⟳ Saving your edits...';
+          } else if (activeStatus === 'error') {
             toastType = 'error';
             toastContent = '⚠ Save Failed';
-          } else if (hasChanges) {
+          } else if (activeHasChanges) {
             toastType = 'unsaved';
-            toastContent = '● Unsaved changes';
-          } else if (saveStatus === 'saved') {
+            toastContent = '● Editing... (saves automatically)';
+          } else if (activeStatus === 'saved') {
             toastType = 'saved';
-            toastContent = '✓ Saved';
+            toastContent = '✓ All edits saved';
           }
 
           return (
@@ -801,6 +828,16 @@ export default function AdminPage() {
   );
 }
 
+// Shared helper text under every Published checkbox
+function PublishedHint({ noun }: { noun: string }) {
+  return (
+    <small className="form-help">
+      Checked = shown on the public site. Uncheck to hide this {noun} while you work on it.
+      Edits always save automatically, whether published or not.
+    </small>
+  );
+}
+
 // Save Status Component
 function SaveStatus({ status }: { status: any }) {
   return (
@@ -865,6 +902,7 @@ function TabEditor({ tab, onChange, onDelete }: { tab: Tab; onChange: (tab: Tab)
         />
         <label htmlFor="tab-visible" className="form-label">Published</label>
       </div>
+      <PublishedHint noun="tab" />
 
       <p className="form-hint"><em>Drag items using the grip handle on the left to reorder.</em></p>
 
@@ -905,6 +943,7 @@ function SectionEditor({ section, onChange, onDelete }: { section: Section; onCh
         />
         <label htmlFor="section-visible" className="form-label">Published</label>
       </div>
+      <PublishedHint noun="section" />
 
       <p className="form-hint"><em>Drag items using the grip handle on the left to reorder.</em></p>
 
@@ -950,10 +989,11 @@ function ContentItemEditor({ item, onChange, onDelete }: { item: ContentItem; on
               'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
               'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
             ],
-            toolbar: 'undo redo | blocks | ' +
-              'bold italic forecolor | alignleft aligncenter ' +
+            toolbar: 'undo redo | blocks fontsize | ' +
+              'bold italic forecolor | link | alignleft aligncenter ' +
               'alignright alignjustify | bullist numlist outdent indent | ' +
-              'styleselect | removeformat | help',
+              'styles | removeformat | help',
+            font_size_formats: '10px 12px 14px 16px 18px 20px 24px 28px 32px',
             formats: {
               lineheight1: { selector: 'p,h1,h2,h3,h4,h5,h6,div', styles: { lineHeight: '1' }},
               lineheight15: { selector: 'p,h1,h2,h3,h4,h5,h6,div', styles: { lineHeight: '1.5' }},
@@ -990,6 +1030,7 @@ function ContentItemEditor({ item, onChange, onDelete }: { item: ContentItem; on
         />
         <label htmlFor="item-visible" className="form-label">Published</label>
       </div>
+      <PublishedHint noun="item" />
 
       <p className="form-hint"><em>Drag items using the grip handle on the left to reorder.</em></p>
 
@@ -1003,6 +1044,132 @@ function ContentItemEditor({ item, onChange, onDelete }: { item: ContentItem; on
         </button>
       </div>
     </div>
+  );
+}
+
+// Icon dropdown with a live preview of the selected icon
+function IconSelect({ value, fallback, onChange, small, selectStyle }: {
+  value?: string;
+  fallback: string;
+  onChange: (icon: string) => void;
+  small?: boolean;
+  selectStyle?: React.CSSProperties;
+}) {
+  return (
+    <>
+      <span className={small ? 'icon-preview icon-preview-sm' : 'icon-preview'}>
+        <LandingIcon name={value} size={small ? 16 : 20} fallback={fallback} />
+      </span>
+      <select
+        className="form-control"
+        style={selectStyle}
+        value={value || fallback}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {LANDING_ICON_NAMES.map(name => (
+          <option key={name} value={name}>{iconLabel(name)}</option>
+        ))}
+      </select>
+    </>
+  );
+}
+
+function IconPicker({ label, value, fallback, onChange }: {
+  label: string;
+  value?: string;
+  fallback: string;
+  onChange: (icon: string) => void;
+}) {
+  return (
+    <div className="form-group">
+      <label className="form-label">{label}</label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <IconSelect value={value} fallback={fallback} onChange={onChange} />
+      </div>
+    </div>
+  );
+}
+
+// Editor for one landing page card (title, description, button, icon, features)
+function LandingCardEditor({ heading, card, fallbackIcon, onChange }: {
+  heading: string;
+  card: LandingPageConfig['caregiverCard'];
+  fallbackIcon: string;
+  onChange: (card: LandingPageConfig['caregiverCard']) => void;
+}) {
+  const features = card.features || [];
+
+  const updateFeature = (index: number, updates: Partial<{ icon: string; text: string }>) => {
+    const next = features.map((f, i) => (i === index ? { ...f, ...updates } : f));
+    onChange({ ...card, features: next });
+  };
+
+  return (
+    <>
+      <h3 style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--text-primary)' }}>{heading}</h3>
+
+      <div className="form-group">
+        <label className="form-label">Card Title</label>
+        <input
+          type="text"
+          className="form-control"
+          value={card.title}
+          onChange={(e) => onChange({ ...card, title: e.target.value })}
+          placeholder="Card title..."
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Card Description</label>
+        <textarea
+          className="form-control"
+          value={card.description}
+          onChange={(e) => onChange({ ...card, description: e.target.value })}
+          placeholder="Card description..."
+          rows={3}
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Button Text</label>
+        <input
+          type="text"
+          className="form-control"
+          value={card.buttonText}
+          onChange={(e) => onChange({ ...card, buttonText: e.target.value })}
+          placeholder="Button text..."
+        />
+      </div>
+
+      <IconPicker
+        label="Card Icon (large symbol at the top of the card)"
+        value={card.icon}
+        fallback={fallbackIcon}
+        onChange={(icon) => onChange({ ...card, icon })}
+      />
+
+      <label className="form-label" style={{ marginTop: 'var(--spacing-md)' }}>
+        Card Features (the three icon + text rows)
+      </label>
+      {features.map((feature, index) => (
+        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: 'var(--spacing-sm)' }}>
+          <IconSelect
+            small
+            selectStyle={{ maxWidth: '180px' }}
+            value={feature.icon}
+            fallback="Shield"
+            onChange={(icon) => updateFeature(index, { icon })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            value={feature.text}
+            onChange={(e) => updateFeature(index, { text: e.target.value })}
+            placeholder="Feature text..."
+          />
+        </div>
+      ))}
+    </>
   );
 }
 
@@ -1036,97 +1203,23 @@ function LandingPageEditor({ data, onChange }: { data: LandingPageConfig; onChan
 
       <hr style={{ margin: 'var(--spacing-xl) 0', borderColor: 'var(--border-color)' }} />
 
-      <h3 style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--text-primary)' }}>Caregiver Card</h3>
-
-      <div className="form-group">
-        <label className="form-label">Card Title</label>
-        <input
-          type="text"
-          className="form-control"
-          value={data.caregiverCard.title}
-          onChange={(e) => onChange({
-            ...data,
-            caregiverCard: { ...data.caregiverCard, title: e.target.value }
-          })}
-          placeholder="INFO4 Caregivers"
-        />
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Card Description</label>
-        <textarea
-          className="form-control"
-          value={data.caregiverCard.description}
-          onChange={(e) => onChange({
-            ...data,
-            caregiverCard: { ...data.caregiverCard, description: e.target.value }
-          })}
-          placeholder="Access resources, training materials..."
-          rows={3}
-        />
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Button Text</label>
-        <input
-          type="text"
-          className="form-control"
-          value={data.caregiverCard.buttonText}
-          onChange={(e) => onChange({
-            ...data,
-            caregiverCard: { ...data.caregiverCard, buttonText: e.target.value }
-          })}
-          placeholder="Explore Caregiver Resources"
-        />
-      </div>
+      <LandingCardEditor
+        heading="Caregiver Card"
+        card={data.caregiverCard}
+        fallbackIcon="User"
+        onChange={(caregiverCard) => onChange({ ...data, caregiverCard })}
+      />
 
       <hr style={{ margin: 'var(--spacing-xl) 0', borderColor: 'var(--border-color)' }} />
 
-      <h3 style={{ marginBottom: 'var(--spacing-lg)', color: 'var(--text-primary)' }}>Care Recipient Card</h3>
+      <LandingCardEditor
+        heading="Care Recipient Card"
+        card={data.careRecipientCard}
+        fallbackIcon="Heart"
+        onChange={(careRecipientCard) => onChange({ ...data, careRecipientCard })}
+      />
 
-      <div className="form-group">
-        <label className="form-label">Card Title</label>
-        <input
-          type="text"
-          className="form-control"
-          value={data.careRecipientCard.title}
-          onChange={(e) => onChange({
-            ...data,
-            careRecipientCard: { ...data.careRecipientCard, title: e.target.value }
-          })}
-          placeholder="INFO4 People with Disabilities"
-        />
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Card Description</label>
-        <textarea
-          className="form-control"
-          value={data.careRecipientCard.description}
-          onChange={(e) => onChange({
-            ...data,
-            careRecipientCard: { ...data.careRecipientCard, description: e.target.value }
-          })}
-          placeholder="Find information about care options..."
-          rows={3}
-        />
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">Button Text</label>
-        <input
-          type="text"
-          className="form-control"
-          value={data.careRecipientCard.buttonText}
-          onChange={(e) => onChange({
-            ...data,
-            careRecipientCard: { ...data.careRecipientCard, buttonText: e.target.value }
-          })}
-          placeholder="Explore Care Recipient Resources"
-        />
-      </div>
-
-      <p className="form-hint"><em>Changes are saved automatically.</em></p>
+      <p className="form-hint"><em>Changes are saved automatically and appear on the public site right away.</em></p>
     </div>
   );
 }

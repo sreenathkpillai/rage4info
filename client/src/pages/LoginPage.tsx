@@ -1,22 +1,34 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail } from 'lucide-react';
+import { api } from '../utils/api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSubmitting(true);
 
-    // Simple mock authentication
-    if (email === 'admin@rage4info.org' && password === 'manage2024') {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const token = response.data?.data?.token;
+      if (!token) {
+        throw new Error('No token in response');
+      }
+      localStorage.setItem('authToken', token);
       localStorage.setItem('isAdmin', 'true');
       navigate('/admin');
-    } else {
-      setError('Invalid email or password');
+    } catch (err: any) {
+      const serverMessage = err?.response?.data?.error;
+      setError(serverMessage || 'Invalid email or password');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -68,18 +80,10 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary btn-lg">
-            Sign In
+          <button type="submit" className="btn btn-primary btn-lg" disabled={submitting}>
+            {submitting ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
-
-        <div className="login-footer">
-          <p className="demo-info">
-            Demo credentials:<br />
-            Email: admin@rage4info.org<br />
-            Password: manage2024
-          </p>
-        </div>
       </div>
 
       <style>{`

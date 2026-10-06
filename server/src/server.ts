@@ -13,6 +13,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Production runs behind Apache's reverse proxy (one hop): trust its
+// X-Forwarded-For so rate limiting keys on the real client IP instead of
+// lumping every visitor into the proxy's 127.0.0.1 bucket.
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(cors({

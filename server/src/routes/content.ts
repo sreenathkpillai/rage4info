@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Content from '../models/Content';
 import fs from 'fs/promises';
 import path from 'path';
+import { authenticateToken } from './auth';
 
 const router = express.Router();
 
@@ -30,6 +31,7 @@ router.get('/', async (req, res) => {
         success: true,
         data: {
           pages: content.pages,
+          landingPage: content.landingPage,
           metadata: content.metadata
         },
         source: 'mongodb'
@@ -89,9 +91,9 @@ router.get('/', async (req, res) => {
 });
 
 // Save/Update content
-router.put('/', async (req, res) => {
+router.put('/', authenticateToken, async (req, res) => {
   try {
-    const { pages, metadata } = req.body;
+    const { pages, landingPage, metadata } = req.body;
 
     if (!pages) {
       return res.status(400).json({
@@ -105,6 +107,14 @@ router.put('/', async (req, res) => {
       lastModified: new Date().toISOString()
     };
 
+    const update: Record<string, any> = {
+      pages,
+      metadata: updatedMetadata
+    };
+    if (landingPage !== undefined) {
+      update.landingPage = landingPage;
+    }
+
     let mongoSaved = false;
     let updatedContent = null;
 
@@ -113,10 +123,7 @@ router.put('/', async (req, res) => {
       try {
         updatedContent = await Content.findOneAndUpdate(
           {},
-          {
-            pages,
-            metadata: updatedMetadata
-          },
+          update,
           {
             upsert: true,
             new: true,
@@ -137,7 +144,23 @@ router.put('/', async (req, res) => {
       await fs.mkdir(backupDir, { recursive: true });
 
       const backupPath = path.join(backupDir, 'content.json');
-      const contentToSave = { pages, metadata: updatedMetadata };
+
+      // A request without landingPage must not erase the stored one from
+      // the backup file (the Mongo path above preserves it the same way)
+      let fileLandingPage = landingPage;
+      if (fileLandingPage === undefined) {
+        fileLandingPage = updatedContent?.landingPage;
+      }
+      if (fileLandingPage === undefined) {
+        try {
+          const existing = JSON.parse(await fs.readFile(backupPath, 'utf-8'));
+          fileLandingPage = existing.landingPage;
+        } catch {
+          // no existing backup to preserve from
+        }
+      }
+
+      const contentToSave = { pages, landingPage: fileLandingPage, metadata: updatedMetadata };
       await fs.writeFile(backupPath, JSON.stringify(contentToSave, null, 2));
       fileSaved = true;
     } catch (fileError) {
@@ -154,8 +177,9 @@ router.put('/', async (req, res) => {
 
     const responseData = updatedContent ? {
       pages: updatedContent.pages,
+      landingPage: updatedContent.landingPage,
       metadata: updatedContent.metadata
-    } : { pages, metadata: updatedMetadata };
+    } : { pages, landingPage, metadata: updatedMetadata };
 
     res.json({
       success: true,
@@ -216,6 +240,7 @@ router.get('/export', async (req, res) => {
 
     res.json({
       pages: content.pages,
+      landingPage: content.landingPage,
       metadata: content.metadata,
       exportedAt: new Date().toISOString()
     });
@@ -229,9 +254,9 @@ router.get('/export', async (req, res) => {
 });
 
 // Restore from backup
-router.post('/import', async (req, res) => {
+router.post('/import', authenticateToken, async (req, res) => {
   try {
-    const { pages, metadata } = req.body;
+    const { pages, landingPage, metadata } = req.body;
 
     if (!pages) {
       return res.status(400).json({
@@ -243,6 +268,7 @@ router.post('/import', async (req, res) => {
     // Create new content document from import
     const importedContent = new Content({
       pages,
+      landingPage,
       metadata: {
         ...metadata,
         lastModified: new Date().toISOString(),
@@ -256,6 +282,7 @@ router.post('/import', async (req, res) => {
       success: true,
       data: {
         pages: importedContent.pages,
+        landingPage: importedContent.landingPage,
         metadata: importedContent.metadata
       },
       message: 'Content imported successfully'

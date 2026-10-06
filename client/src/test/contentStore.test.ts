@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useContentStore } from '../store/contentStore';
 
-// Mock axios
-vi.mock('axios', () => ({
-  default: {
+// Mock the shared API client
+vi.mock('../utils/api', () => ({
+  API_BASE_URL: 'http://localhost:3001/api',
+  api: {
     get: vi.fn(),
     put: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
@@ -39,12 +41,30 @@ describe('Content Store', () => {
   });
 
   it('should update current page', () => {
+    // setCurrentPage only navigates to pages that exist in loaded content
+    useContentStore.setState({
+      content: {
+        pages: {
+          caregiver: { id: 'caregiver', title: 'Caregiver', description: '', tabs: [] },
+          carerecipient: { id: 'carerecipient', title: 'Care Recipient', description: '', tabs: [] },
+        },
+      },
+    });
+
     const { setCurrentPage } = useContentStore.getState();
 
     setCurrentPage('carerecipient');
 
     const state = useContentStore.getState();
     expect(state.currentPageId).toBe('carerecipient');
+  });
+
+  it('should ignore navigation to pages that do not exist', () => {
+    const { setCurrentPage } = useContentStore.getState();
+
+    setCurrentPage('carerecipient'); // no content loaded yet
+
+    expect(useContentStore.getState().currentPageId).toBe('caregiver');
   });
 
   it('should update search query', () => {

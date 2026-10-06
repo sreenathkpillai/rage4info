@@ -32,19 +32,22 @@ interface IPage {
     tabs: ITab[];
     theme?: 'light' | 'dark';
 }
+interface ILandingCardFeature {
+    icon: string;
+    text: string;
+}
+interface ILandingPageCard {
+    title: string;
+    description: string;
+    buttonText: string;
+    icon?: string;
+    features?: ILandingCardFeature[];
+}
 interface ILandingPageConfig {
     heroTitle: string;
     heroSubtitle: string;
-    caregiverCard: {
-        title: string;
-        description: string;
-        buttonText: string;
-    };
-    careRecipientCard: {
-        title: string;
-        description: string;
-        buttonText: string;
-    };
+    caregiverCard: ILandingPageCard;
+    careRecipientCard: ILandingPageCard;
 }
 export interface IContentDocument extends Document {
     pages: {

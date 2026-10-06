@@ -397,6 +397,8 @@ a:hover {
   align-items: center;
 }
 
+/* Positioned fully inside the tab bar - placing them outside the container
+   (negative offsets) let ancestor overflow clip them to an invisible sliver. */
 .scroll-arrow {
   position: absolute;
   top: 50%;
@@ -408,9 +410,9 @@ a:hover {
   align-items: center;
   justify-content: center;
   background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--brand-primary);
   border-radius: var(--radius-full);
-  color: var(--text-secondary);
+  color: var(--brand-primary);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
@@ -423,16 +425,15 @@ a:hover {
 }
 
 .scroll-arrow-left {
-  left: -12px;
+  left: 4px;
 }
 
 .scroll-arrow-right {
-  right: -12px;
+  right: 4px;
 }
 
 .tabs-with-arrows .tabs-list {
   flex: 1;
-  margin: 0 8px;
 }
 
 .tab-button {

@@ -37,19 +37,24 @@ export interface Page {
   theme?: 'light' | 'dark';
 }
 
+export interface LandingCardFeature {
+  icon: string;
+  text: string;
+}
+
+export interface LandingPageCard {
+  title: string;
+  description: string;
+  buttonText: string;
+  icon?: string;
+  features?: LandingCardFeature[];
+}
+
 export interface LandingPageConfig {
   heroTitle: string;
   heroSubtitle: string;
-  caregiverCard: {
-    title: string;
-    description: string;
-    buttonText: string;
-  };
-  careRecipientCard: {
-    title: string;
-    description: string;
-    buttonText: string;
-  };
+  caregiverCard: LandingPageCard;
+  careRecipientCard: LandingPageCard;
 }
 
 export interface ContentSchema {

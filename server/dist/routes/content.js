@@ -8,6 +8,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Content_1 = __importDefault(require("../models/Content"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
+const auth_1 = require("./auth");
 const router = express_1.default.Router();
 // Helper function to check if MongoDB is available
 const isMongoAvailable = () => {
@@ -31,6 +32,7 @@ router.get('/', async (req, res) => {
                 success: true,
                 data: {
                     pages: content.pages,
+                    landingPage: content.landingPage,
                     metadata: content.metadata
                 },
                 source: 'mongodb'
@@ -87,9 +89,9 @@ router.get('/', async (req, res) => {
     }
 });
 // Save/Update content
-router.put('/', async (req, res) => {
+router.put('/', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { pages, metadata } = req.body;
+        const { pages, landingPage, metadata } = req.body;
         if (!pages) {
             return res.status(400).json({
                 success: false,
@@ -100,15 +102,19 @@ router.put('/', async (req, res) => {
             ...metadata,
             lastModified: new Date().toISOString()
         };
+        const update = {
+            pages,
+            metadata: updatedMetadata
+        };
+        if (landingPage !== undefined) {
+            update.landingPage = landingPage;
+        }
         let mongoSaved = false;
         let updatedContent = null;
         // Try to save to MongoDB if available
         if (isMongoAvailable()) {
             try {
-                updatedContent = await Content_1.default.findOneAndUpdate({}, {
-                    pages,
-                    metadata: updatedMetadata
-                }, {
+                updatedContent = await Content_1.default.findOneAndUpdate({}, update, {
                     upsert: true,
                     new: true,
                     runValidators: true
@@ -126,7 +132,22 @@ router.put('/', async (req, res) => {
             const backupDir = path_1.default.join(__dirname, '../../data');
             await promises_1.default.mkdir(backupDir, { recursive: true });
             const backupPath = path_1.default.join(backupDir, 'content.json');
-            const contentToSave = { pages, metadata: updatedMetadata };
+            // A request without landingPage must not erase the stored one from
+            // the backup file (the Mongo path above preserves it the same way)
+            let fileLandingPage = landingPage;
+            if (fileLandingPage === undefined) {
+                fileLandingPage = updatedContent?.landingPage;
+            }
+            if (fileLandingPage === undefined) {
+                try {
+                    const existing = JSON.parse(await promises_1.default.readFile(backupPath, 'utf-8'));
+                    fileLandingPage = existing.landingPage;
+                }
+                catch {
+                    // no existing backup to preserve from
+                }
+            }
+            const contentToSave = { pages, landingPage: fileLandingPage, metadata: updatedMetadata };
             await promises_1.default.writeFile(backupPath, JSON.stringify(contentToSave, null, 2));
             fileSaved = true;
         }
@@ -142,8 +163,9 @@ router.put('/', async (req, res) => {
         }
         const responseData = updatedContent ? {
             pages: updatedContent.pages,
+            landingPage: updatedContent.landingPage,
             metadata: updatedContent.metadata
-        } : { pages, metadata: updatedMetadata };
+        } : { pages, landingPage, metadata: updatedMetadata };
         res.json({
             success: true,
             data: responseData,
@@ -199,6 +221,7 @@ router.get('/export', async (req, res) => {
         res.setHeader('Content-Disposition', `attachment; filename="content-backup-${Date.now()}.json"`);
         res.json({
             pages: content.pages,
+            landingPage: content.landingPage,
             metadata: content.metadata,
             exportedAt: new Date().toISOString()
         });
@@ -212,9 +235,9 @@ router.get('/export', async (req, res) => {
     }
 });
 // Restore from backup
-router.post('/import', async (req, res) => {
+router.post('/import', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { pages, metadata } = req.body;
+        const { pages, landingPage, metadata } = req.body;
         if (!pages) {
             return res.status(400).json({
                 success: false,
@@ -224,6 +247,7 @@ router.post('/import', async (req, res) => {
         // Create new content document from import
         const importedContent = new Content_1.default({
             pages,
+            landingPage,
             metadata: {
                 ...metadata,
                 lastModified: new Date().toISOString(),
@@ -235,6 +259,7 @@ router.post('/import', async (req, res) => {
             success: true,
             data: {
                 pages: importedContent.pages,
+                landingPage: importedContent.landingPage,
                 metadata: importedContent.metadata
             },
             message: 'Content imported successfully'

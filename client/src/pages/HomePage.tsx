@@ -1,32 +1,15 @@
 import { Link } from 'react-router-dom';
-import { User, Heart, Shield, Clock, Users, BookOpen } from 'lucide-react';
 import { useContentStore } from '../store/contentStore';
-
-// Default landing page content
-const defaultLandingPage = {
-  heroTitle: 'Welcome to RAGE4INFO',
-  heroSubtitle: 'Your comprehensive resource for caregiving information and support',
-  caregiverCard: {
-    title: 'INFO4 Caregivers',
-    description: 'Access resources, training materials, and support tools designed specifically for professional and family caregivers.',
-    buttonText: 'Explore Caregiver Resources'
-  },
-  careRecipientCard: {
-    title: 'INFO4 People with Disabilities',
-    description: 'Find information about care options, support services, and resources to help maintain independence and quality of life.',
-    buttonText: 'Explore Care Recipient Resources'
-  }
-};
+import { mergeLandingPage, LandingIcon } from '../utils/landingIcons';
 
 export default function HomePage() {
   const { content } = useContentStore();
 
-  // Use store values with fallbacks to defaults
-  const landingPage = content?.landingPage || defaultLandingPage;
-  const heroTitle = landingPage.heroTitle || defaultLandingPage.heroTitle;
-  const heroSubtitle = landingPage.heroSubtitle || defaultLandingPage.heroSubtitle;
-  const caregiverCard = { ...defaultLandingPage.caregiverCard, ...landingPage.caregiverCard };
-  const careRecipientCard = { ...defaultLandingPage.careRecipientCard, ...landingPage.careRecipientCard };
+  // Same defaults-merge the admin editor and store use
+  const landingPage = mergeLandingPage(content?.landingPage);
+  const { heroTitle, heroSubtitle, caregiverCard, careRecipientCard } = landingPage;
+  const caregiverFeatures = caregiverCard.features!;
+  const careRecipientFeatures = careRecipientCard.features!;
 
   return (
     <div className="home-page">
@@ -38,23 +21,17 @@ export default function HomePage() {
       <div className="role-cards">
         <Link to="/caregiver" className="role-card caregiver-card">
           <div className="role-card-icon">
-            <User size={48} />
+            <LandingIcon name={caregiverCard.icon} size={48} fallback="User" />
           </div>
           <h2 className="role-card-title">{caregiverCard.title}</h2>
           <p className="role-card-description">{caregiverCard.description}</p>
           <div className="role-card-features">
-            <div className="feature-item">
-              <Shield size={20} />
-              <span>Professional Development</span>
-            </div>
-            <div className="feature-item">
-              <Clock size={20} />
-              <span>Time Management Tools</span>
-            </div>
-            <div className="feature-item">
-              <BookOpen size={20} />
-              <span>Training Resources</span>
-            </div>
+            {caregiverFeatures.map((feature, index) => (
+              <div className="feature-item" key={index}>
+                <LandingIcon name={feature.icon} size={20} fallback="Shield" />
+                <span>{feature.text}</span>
+              </div>
+            ))}
           </div>
           <button className="btn btn-primary">
             {caregiverCard.buttonText}
@@ -63,23 +40,17 @@ export default function HomePage() {
 
         <Link to="/care-recipient" className="role-card recipient-card">
           <div className="role-card-icon">
-            <Heart size={48} />
+            <LandingIcon name={careRecipientCard.icon} size={48} fallback="Heart" />
           </div>
           <h2 className="role-card-title">{careRecipientCard.title}</h2>
           <p className="role-card-description">{careRecipientCard.description}</p>
           <div className="role-card-features">
-            <div className="feature-item">
-              <Users size={20} />
-              <span>Support Networks</span>
-            </div>
-            <div className="feature-item">
-              <Shield size={20} />
-              <span>Safety Resources</span>
-            </div>
-            <div className="feature-item">
-              <Heart size={20} />
-              <span>Wellness Programs</span>
-            </div>
+            {careRecipientFeatures.map((feature, index) => (
+              <div className="feature-item" key={index}>
+                <LandingIcon name={feature.icon} size={20} fallback="Users" />
+                <span>{feature.text}</span>
+              </div>
+            ))}
           </div>
           <button className="btn btn-primary">
             {careRecipientCard.buttonText}

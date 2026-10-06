@@ -42,19 +42,24 @@ interface IPage {
 }
 
 // Interface for Landing Page Config
+interface ILandingCardFeature {
+  icon: string;
+  text: string;
+}
+
+interface ILandingPageCard {
+  title: string;
+  description: string;
+  buttonText: string;
+  icon?: string;
+  features?: ILandingCardFeature[];
+}
+
 interface ILandingPageConfig {
   heroTitle: string;
   heroSubtitle: string;
-  caregiverCard: {
-    title: string;
-    description: string;
-    buttonText: string;
-  };
-  careRecipientCard: {
-    title: string;
-    description: string;
-    buttonText: string;
-  };
+  caregiverCard: ILandingPageCard;
+  careRecipientCard: ILandingPageCard;
 }
 
 // Interface for the main Content document
@@ -110,10 +115,17 @@ const PageSchema = new Schema<IPage>({
   theme: { type: String, enum: ['light', 'dark'], default: 'light' }
 });
 
+const LandingCardFeatureSchema = new Schema({
+  icon: { type: String, default: '' },
+  text: { type: String, default: '' }
+}, { _id: false });
+
 const LandingPageCardSchema = new Schema({
   title: { type: String, default: '' },
   description: { type: String, default: '' },
-  buttonText: { type: String, default: '' }
+  buttonText: { type: String, default: '' },
+  icon: { type: String, default: '' },
+  features: { type: [LandingCardFeatureSchema], default: undefined }
 }, { _id: false });
 
 const LandingPageSchema = new Schema({

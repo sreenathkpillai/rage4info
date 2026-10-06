@@ -7,20 +7,92 @@ exports.requireAdmin = exports.authenticateToken = void 0;
 const express_1 = __importDefault(require("express"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const router = express_1.default.Router();
-// Simple in-memory user store (replace with database in production)
-const users = [
-    {
-        id: 'admin-1',
-        email: 'admin@care.com',
-        password: '$2a$10$8ZVzW3P1yxRPKjF2Q7Xl3.VG9.xK5P9XNp0QJ.L9V8Q3P1yxRPKjF2', // admin123
-        role: 'admin',
-        name: 'System Administrator'
+// Admin credentials come from environment variables:
+//   ADMIN_EMAIL          - login email
+//   ADMIN_PASSWORD_HASH  - bcrypt hash of the password (preferred), or
+//   ADMIN_PASSWORD       - plain password, hashed on first use
+//
+// They are resolved lazily (on first request), NOT at import time: this
+// module is imported before dotenv.config() runs in server.ts, so reading
+// process.env here at load time would silently ignore the .env file.
+// Secrets that ship in this repo or its examples - never acceptable in production
+const PLACEHOLDER_SECRETS = new Set([
+    'fallback-secret-key',
+    'your-super-secure-jwt-secret-minimum-32-characters',
+    'your-very-secure-jwt-secret-key-here'
+]);
+const LEGACY_DEFAULT_EMAIL = 'admin@rage4info.org';
+const LEGACY_DEFAULT_PASSWORD = 'manage2024';
+let cachedUser = null;
+let usingFallbackPassword = false;
+const getAdminUser = () => {
+    if (!cachedUser) {
+        let passwordHash;
+        if (process.env.ADMIN_PASSWORD_HASH) {
+            passwordHash = process.env.ADMIN_PASSWORD_HASH;
+        }
+        else if (process.env.ADMIN_PASSWORD) {
+            passwordHash = bcryptjs_1.default.hashSync(process.env.ADMIN_PASSWORD, 10);
+        }
+        else {
+            usingFallbackPassword = true;
+            console.warn('WARNING: ADMIN_PASSWORD / ADMIN_PASSWORD_HASH not set - using the default admin password. ' +
+                'Set these in the server .env file before launch.');
+            passwordHash = bcryptjs_1.default.hashSync(LEGACY_DEFAULT_PASSWORD, 10);
+        }
+        cachedUser = {
+            id: 'admin-1',
+            email: process.env.ADMIN_EMAIL || LEGACY_DEFAULT_EMAIL,
+            passwordHash,
+            role: 'admin',
+            name: 'RAGE4INFO Administrator'
+        };
     }
-];
+    return cachedUser;
+};
+const getJwtSecret = () => {
+    const secret = process.env.JWT_SECRET || 'fallback-secret-key';
+    return secret;
+};
+// In production, refuse admin auth entirely when secrets are missing or
+// placeholders - otherwise anyone who has read this repo (or the old login
+// page) can log in or forge tokens.
+const authConfigError = () => {
+    if (process.env.NODE_ENV !== 'production')
+        return null;
+    if (PLACEHOLDER_SECRETS.has(getJwtSecret())) {
+        return 'JWT_SECRET is missing or still a placeholder';
+    }
+    getAdminUser();
+    if (usingFallbackPassword) {
+        return 'ADMIN_PASSWORD / ADMIN_PASSWORD_HASH is not set';
+    }
+    return null;
+};
+// Throttle login attempts to slow down password guessing
+const loginLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    message: {
+        success: false,
+        error: 'Too many login attempts. Please try again in 15 minutes.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
+        const configError = authConfigError();
+        if (configError) {
+            console.error(`Login rejected: ${configError}`);
+            return res.status(503).json({
+                success: false,
+                error: 'Admin login is disabled: the server is missing secure credentials. See v2/docs/HANDOVER.md section 4.'
+            });
+        }
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({
@@ -28,16 +100,15 @@ router.post('/login', async (req, res) => {
                 error: 'Email and password are required'
             });
         }
-        // Find user
-        const user = users.find(u => u.email === email);
-        if (!user) {
+        const user = getAdminUser();
+        if (email !== user.email) {
             return res.status(401).json({
                 success: false,
                 error: 'Invalid credentials'
             });
         }
         // Check password
-        const isValidPassword = await bcryptjs_1.default.compare(password, user.password);
+        const isValidPassword = await bcryptjs_1.default.compare(password, user.passwordHash);
         if (!isValidPassword) {
             return res.status(401).json({
                 success: false,
@@ -49,7 +120,7 @@ router.post('/login', async (req, res) => {
             userId: user.id,
             email: user.email,
             role: user.role
-        }, process.env.JWT_SECRET || 'fallback-secret-key', { expiresIn: '24h' });
+        }, getJwtSecret(), { expiresIn: '24h' });
         res.json({
             success: true,
             data: {
@@ -81,9 +152,9 @@ router.post('/verify', (req, res) => {
                 error: 'Token is required'
             });
         }
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'fallback-secret-key');
-        const user = users.find(u => u.id === decoded.userId);
-        if (!user) {
+        const decoded = jsonwebtoken_1.default.verify(token, getJwtSecret());
+        const user = getAdminUser();
+        if (decoded.userId !== user.id) {
             return res.status(401).json({
                 success: false,
                 error: 'Invalid token'
@@ -117,6 +188,14 @@ router.post('/logout', (req, res) => {
 });
 // Middleware to protect routes
 const authenticateToken = (req, res, next) => {
+    // A placeholder JWT secret in production means any token could be forged
+    // offline - refuse writes entirely rather than accept forgeable tokens.
+    if (process.env.NODE_ENV === 'production' && PLACEHOLDER_SECRETS.has(getJwtSecret())) {
+        return res.status(503).json({
+            success: false,
+            error: 'Admin actions are disabled: the server is missing secure credentials. See v2/docs/HANDOVER.md section 4.'
+        });
+    }
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if (!token) {
@@ -126,7 +205,7 @@ const authenticateToken = (req, res, next) => {
         });
     }
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'fallback-secret-key');
+        const decoded = jsonwebtoken_1.default.verify(token, getJwtSecret());
         req.user = decoded;
         next();
     }

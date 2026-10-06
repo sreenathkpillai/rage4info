@@ -35,6 +35,17 @@ export default function TabNavigation({ tabs }: TabNavigationProps) {
     return () => window.removeEventListener('resize', checkScrollPosition);
   }, [checkScrollPosition, visibleTabs]);
 
+  // Re-check when the tab list itself changes size (fonts loading,
+  // container resizing) - window resize alone misses these.
+  useEffect(() => {
+    const container = tabsListRef.current;
+    if (!container || typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(checkScrollPosition);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [checkScrollPosition]);
+
   // Scroll left/right by a fixed amount
   const scrollLeft = () => {
     const container = tabsListRef.current;

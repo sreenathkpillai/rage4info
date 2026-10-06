@@ -11,7 +11,7 @@ describe('HomePage Component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Welcome to Care Resource Hub')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to RAGE4INFO')).toBeInTheDocument();
   });
 
   it('should render role cards', () => {
@@ -21,8 +21,8 @@ describe('HomePage Component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('For Caregivers')).toBeInTheDocument();
-    expect(screen.getByText('For Care Recipients')).toBeInTheDocument();
+    expect(screen.getByText('INFO4 Caregivers')).toBeInTheDocument();
+    expect(screen.getByText('INFO4 People with Disabilities')).toBeInTheDocument();
   });
 
   it('should have navigation links', () => {

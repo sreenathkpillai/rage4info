@@ -23,10 +23,40 @@ async function fetchContent() {
   return data.data;
 }
 
+// Saving requires admin login (the content API rejects unauthenticated
+// writes). Provide API_TOKEN, or ADMIN_EMAIL + ADMIN_PASSWORD, as env vars.
+async function getAuthToken() {
+  if (process.env.API_TOKEN) return process.env.API_TOKEN;
+
+  const email = process.env.ADMIN_EMAIL || 'admin@rage4info.org';
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) {
+    throw new Error(
+      'Saving requires authentication. Set ADMIN_PASSWORD (and optionally ADMIN_EMAIL), ' +
+      'or API_TOKEN, e.g.: ADMIN_PASSWORD=... node fix-markdown.js'
+    );
+  }
+
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  if (!response.ok) {
+    throw new Error(`Login failed: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.data.token;
+}
+
 async function saveContent(content) {
+  const token = await getAuthToken();
   const response = await fetch(`${API_URL}/content`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify(content)
   });
   if (!response.ok) {

@@ -554,3 +554,21 @@
     background: rgba(59, 130, 246, 0.2);
   }
 }
+/* Icon picker preview badge (landing page editor) */
+.icon-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--brand-primary);
+}
+
+.icon-preview-sm {
+  width: 34px;
+  height: 34px;
+}

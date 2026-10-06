@@ -29,6 +29,14 @@ export const useAutoSave = (
       return;
     }
 
+    // Content appearing for the first time (null -> data, e.g. an editor
+    // being initialized from the store) is a new baseline, not a user edit.
+    if (initialContentRef.current == null && content != null) {
+      initialContentRef.current = content;
+      setHasChanges(false);
+      return;
+    }
+
     const contentChanged = JSON.stringify(content) !== JSON.stringify(initialContentRef.current);
     setHasChanges(contentChanged);
 

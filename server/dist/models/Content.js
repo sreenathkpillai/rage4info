@@ -68,10 +68,16 @@ const PageSchema = new mongoose_1.Schema({
     tabs: [TabSchema],
     theme: { type: String, enum: ['light', 'dark'], default: 'light' }
 });
+const LandingCardFeatureSchema = new mongoose_1.Schema({
+    icon: { type: String, default: '' },
+    text: { type: String, default: '' }
+}, { _id: false });
 const LandingPageCardSchema = new mongoose_1.Schema({
     title: { type: String, default: '' },
     description: { type: String, default: '' },
-    buttonText: { type: String, default: '' }
+    buttonText: { type: String, default: '' },
+    icon: { type: String, default: '' },
+    features: { type: [LandingCardFeatureSchema], default: undefined }
 }, { _id: false });
 const LandingPageSchema = new mongoose_1.Schema({
     heroTitle: { type: String, default: 'Welcome to RAGE4INFO' },
