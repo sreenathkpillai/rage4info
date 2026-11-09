@@ -404,24 +404,37 @@ a:hover {
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-primary);
+  /* Filled teal circle + bold white chevron so the control is unmistakable
+     (a thin teal chevron on a white ring read as "just an oval" to the client). */
+  background: var(--brand-primary);
   border: 2px solid var(--brand-primary);
   border-radius: var(--radius-full);
-  color: var(--brand-primary);
+  color: #ffffff;
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
 }
 
+/* Force the chevron to render at a clear size and in the button's color,
+   independent of the icon library's defaults. */
+.scroll-arrow svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  display: block;
+}
+
 .scroll-arrow:hover {
   background: var(--brand-primary);
-  color: white;
+  color: #ffffff;
   border-color: var(--brand-primary);
+  filter: brightness(1.12);
 }
 
 .scroll-arrow-left {
