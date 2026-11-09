@@ -39,6 +39,9 @@ interface ContentState {
 
   // Landing page operations
   updateLandingPage: (landingPage: LandingPageConfig) => Promise<void>;
+  // Draft mode: save landing edits privately; publish pushes them live.
+  updateLandingPageDraft: (landingPage: LandingPageConfig) => Promise<void>;
+  publishLandingPage: () => Promise<void>;
 }
 
 export const useContentStore = create<ContentState>((set, get) => {
@@ -360,6 +363,52 @@ export const useContentStore = create<ContentState>((set, get) => {
 
       set({ content: updatedContent });
       await persist(updatedContent);
+    },
+
+    // Save the landing page to its private DRAFT. The public site is NOT
+    // changed - it keeps showing `landingPage` until publishLandingPage().
+    updateLandingPageDraft: async (landingPage: LandingPageConfig) => {
+      const content = get().content;
+      if (!content) return;
+
+      const draft = mergeLandingPage(landingPage);
+      set({ content: { ...content, landingPageDraft: draft } });
+
+      try {
+        await api.put('/content/landing/draft', { landingPage: draft });
+        if (get().error) set({ error: null });
+      } catch (error: any) {
+        const status = error?.response?.status;
+        if (status === 401 || status === 403) {
+          set({ error: 'Your login session has expired. Please log out, log back in, and repeat your last change.' });
+        } else {
+          set({ error: 'Failed to save your draft - your latest change may not be stored' });
+        }
+        throw error;
+      }
+    },
+
+    // Publish: copy the draft onto the live landing page so the public site
+    // updates. Works like ticking the Published box on a tab/section.
+    publishLandingPage: async () => {
+      const content = get().content;
+      if (!content) return;
+
+      const published = mergeLandingPage(content.landingPageDraft ?? content.landingPage);
+      set({ content: { ...content, landingPage: published, landingPageDraft: published } });
+
+      try {
+        await api.post('/content/landing/publish', { landingPage: published });
+        if (get().error) set({ error: null });
+      } catch (error: any) {
+        const status = error?.response?.status;
+        if (status === 401 || status === 403) {
+          set({ error: 'Your login session has expired. Please log out, log back in, and press Publish again.' });
+        } else {
+          set({ error: 'Failed to publish the landing page - please try again' });
+        }
+        throw error;
+      }
     }
   };
 });

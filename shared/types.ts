@@ -62,6 +62,9 @@ export interface ContentSchema {
     [pageId: string]: Page;
   };
   landingPage?: LandingPageConfig;
+  // Private working copy of the landing page. Admin edits save here; the
+  // public site keeps showing `landingPage` until the admin presses Publish.
+  landingPageDraft?: LandingPageConfig;
   metadata?: {
     version: string;
     lastModified: string;

@@ -41,7 +41,8 @@ export default function AdminPage() {
     reorderTabs,
     reorderSections,
     reorderContentItems,
-    updateLandingPage
+    updateLandingPageDraft,
+    publishLandingPage
   } = useContentStore();
 
   const [selectedPage, setSelectedPage] = useState('caregiver');
@@ -56,7 +57,8 @@ export default function AdminPage() {
   // Older saved data may predate the icon/feature fields, so merge with defaults.
   useEffect(() => {
     if (selectedPage === 'landing' && content) {
-      setLandingPageData(mergeLandingPage(content.landingPage));
+      // Edit the private draft if one exists, otherwise start from what's live.
+      setLandingPageData(mergeLandingPage(content.landingPageDraft ?? content.landingPage));
     }
   }, [selectedPage, content]);
 
@@ -111,8 +113,9 @@ export default function AdminPage() {
   // useAutoSave only calls this when the data actually changed.
   const saveLandingPage = useCallback(async () => {
     if (!landingPageData) return;
-    await updateLandingPage(landingPageData);
-  }, [landingPageData, updateLandingPage]);
+    // Autosave to the private draft; the public site only changes on Publish.
+    await updateLandingPageDraft(landingPageData);
+  }, [landingPageData, updateLandingPageDraft]);
 
   const { saveStatus: landingSaveStatus, hasChanges: landingHasChanges, manualSave: landingManualSave } = useAutoSave(
     saveLandingPage,
@@ -581,6 +584,11 @@ export default function AdminPage() {
                 <SaveStatus status={landingSaveStatus || 'saved'} />
               </div>
               <div className="editor-body">
+                <LandingPublishControl
+                  draft={landingPageData}
+                  published={content?.landingPage}
+                  onPublish={publishLandingPage}
+                />
                 {landingPageData && (
                   <LandingPageEditor
                     data={landingPageData}
@@ -825,6 +833,77 @@ export default function AdminPage() {
       `}</style>
     </div>
     </DndProvider>
+  );
+}
+
+// Draft-mode publish control for the landing page. The landing page can't be
+// "hidden" like a tab, so instead of a visibility toggle this publishes the
+// private draft onto the live site - matching the Published box's check-to-go-live
+// feel (the client asked for continuity with the other Published checkboxes).
+function LandingPublishControl({
+  draft,
+  published,
+  onPublish,
+}: {
+  draft: LandingPageConfig | null;
+  published?: LandingPageConfig;
+  onPublish: () => Promise<void>;
+}) {
+  const [publishing, setPublishing] = useState(false);
+  if (!draft) return null;
+
+  const hasUnpublished =
+    JSON.stringify(mergeLandingPage(draft)) !== JSON.stringify(mergeLandingPage(published));
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    try {
+      await onPublish();
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  return (
+    <div
+      className="landing-publish"
+      style={{
+        marginBottom: 'var(--spacing-lg)',
+        padding: 'var(--spacing-md)',
+        border: '1px solid var(--border-color, #e2e8f0)',
+        borderRadius: 'var(--radius-md, 8px)',
+        background: 'var(--bg-secondary, #f7fafc)',
+      }}
+    >
+      <div className="form-checkbox">
+        <input
+          type="checkbox"
+          id="landing-published"
+          checked={!hasUnpublished}
+          disabled={!hasUnpublished || publishing}
+          onChange={(e) => {
+            if (e.target.checked) handlePublish();
+          }}
+        />
+        <label htmlFor="landing-published" className="form-label">
+          Published {hasUnpublished ? '— you have unpublished draft changes' : '— live and up to date'}
+        </label>
+      </div>
+      <small className="form-help">
+        Your landing-page edits save automatically as a private draft — the public site does
+        not change until you Publish. (This works like the Published box on tabs and sections.)
+      </small>
+      <div style={{ marginTop: 'var(--spacing-sm)' }}>
+        <button
+          className="btn btn-primary"
+          onClick={handlePublish}
+          disabled={!hasUnpublished || publishing}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          {publishing ? 'Publishing…' : hasUnpublished ? 'Publish landing page' : 'Published ✓'}
+        </button>
+      </div>
+    </div>
   );
 }
 

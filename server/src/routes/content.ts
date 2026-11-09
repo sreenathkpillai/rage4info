@@ -32,6 +32,7 @@ router.get('/', async (req, res) => {
         data: {
           pages: content.pages,
           landingPage: content.landingPage,
+          landingPageDraft: content.landingPageDraft,
           metadata: content.metadata
         },
         source: 'mongodb'
@@ -145,22 +146,24 @@ router.put('/', authenticateToken, async (req, res) => {
 
       const backupPath = path.join(backupDir, 'content.json');
 
+      let existingBackup: any = {};
+      try {
+        existingBackup = JSON.parse(await fs.readFile(backupPath, 'utf-8'));
+      } catch {
+        // no existing backup to preserve from
+      }
+
       // A request without landingPage must not erase the stored one from
       // the backup file (the Mongo path above preserves it the same way)
       let fileLandingPage = landingPage;
       if (fileLandingPage === undefined) {
-        fileLandingPage = updatedContent?.landingPage;
-      }
-      if (fileLandingPage === undefined) {
-        try {
-          const existing = JSON.parse(await fs.readFile(backupPath, 'utf-8'));
-          fileLandingPage = existing.landingPage;
-        } catch {
-          // no existing backup to preserve from
-        }
+        fileLandingPage = updatedContent?.landingPage ?? existingBackup.landingPage;
       }
 
-      const contentToSave = { pages, landingPage: fileLandingPage, metadata: updatedMetadata };
+      // Preserve the unpublished landing draft across non-landing saves.
+      const fileLandingDraft = updatedContent?.landingPageDraft ?? existingBackup.landingPageDraft;
+
+      const contentToSave = { pages, landingPage: fileLandingPage, landingPageDraft: fileLandingDraft, metadata: updatedMetadata };
       await fs.writeFile(backupPath, JSON.stringify(contentToSave, null, 2));
       fileSaved = true;
     } catch (fileError) {
@@ -293,6 +296,96 @@ router.post('/import', authenticateToken, async (req, res) => {
       success: false,
       error: 'Failed to import content'
     });
+  }
+});
+
+// Save the landing-page DRAFT only. The public site keeps showing the
+// published `landingPage` until POST /landing/publish is called.
+router.put('/landing/draft', authenticateToken, async (req, res) => {
+  try {
+    const { landingPage } = req.body; // the draft config
+    if (!landingPage) {
+      return res.status(400).json({ success: false, error: 'landingPage (draft) is required' });
+    }
+
+    let saved: any = null;
+    if (isMongoAvailable()) {
+      try {
+        saved = await Content.findOneAndUpdate({}, { landingPageDraft: landingPage }, { new: true });
+      } catch (mongoError) {
+        console.warn('Failed to save landing draft to MongoDB:', mongoError);
+      }
+    }
+
+    // Keep the file backup in sync (primary storage when Mongo is down).
+    try {
+      const backupPath = path.join(__dirname, '../../data/content.json');
+      let existing: any = {};
+      try { existing = JSON.parse(await fs.readFile(backupPath, 'utf-8')); } catch { /* none */ }
+      await fs.mkdir(path.dirname(backupPath), { recursive: true });
+      await fs.writeFile(backupPath, JSON.stringify({ ...existing, landingPageDraft: landingPage }, null, 2));
+    } catch (fileError) {
+      console.error('Failed to save landing draft to file:', fileError);
+    }
+
+    return res.json({
+      success: true,
+      data: { landingPageDraft: saved?.landingPageDraft ?? landingPage },
+      message: 'Landing draft saved (not yet published)'
+    });
+  } catch (error) {
+    console.error('Error saving landing draft:', error);
+    res.status(500).json({ success: false, error: 'Failed to save landing draft' });
+  }
+});
+
+// Publish the landing page: copy the draft onto the live `landingPage` so the
+// public site updates. Mirrors ticking the Published box on a tab/section.
+router.post('/landing/publish', authenticateToken, async (req, res) => {
+  try {
+    let draft = req.body?.landingPage; // latest client draft, if provided
+
+    let saved: any = null;
+    if (isMongoAvailable()) {
+      try {
+        if (draft === undefined) {
+          const current = await Content.findOne().sort({ updatedAt: -1 }).exec();
+          draft = current?.landingPageDraft ?? current?.landingPage;
+        }
+        if (draft !== undefined) {
+          saved = await Content.findOneAndUpdate({}, { landingPage: draft, landingPageDraft: draft }, { new: true });
+        }
+      } catch (mongoError) {
+        console.warn('Failed to publish landing page to MongoDB:', mongoError);
+      }
+    }
+
+    // Keep the file backup in sync.
+    try {
+      const backupPath = path.join(__dirname, '../../data/content.json');
+      let existing: any = {};
+      try { existing = JSON.parse(await fs.readFile(backupPath, 'utf-8')); } catch { /* none */ }
+      if (draft === undefined) draft = existing.landingPageDraft ?? existing.landingPage;
+      if (draft !== undefined) {
+        await fs.mkdir(path.dirname(backupPath), { recursive: true });
+        await fs.writeFile(backupPath, JSON.stringify({ ...existing, landingPage: draft, landingPageDraft: draft }, null, 2));
+      }
+    } catch (fileError) {
+      console.error('Failed to publish landing page to file:', fileError);
+    }
+
+    if (draft === undefined) {
+      return res.status(400).json({ success: false, error: 'No landing draft to publish' });
+    }
+
+    return res.json({
+      success: true,
+      data: { landingPage: saved?.landingPage ?? draft },
+      message: 'Landing page published'
+    });
+  } catch (error) {
+    console.error('Error publishing landing page:', error);
+    res.status(500).json({ success: false, error: 'Failed to publish landing page' });
   }
 });
 

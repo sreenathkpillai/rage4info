@@ -68,6 +68,7 @@ export interface IContentDocument extends Document {
     [pageId: string]: IPage;
   };
   landingPage?: ILandingPageConfig;
+  landingPageDraft?: ILandingPageConfig;
   metadata?: {
     version: string;
     lastModified: string;
@@ -150,6 +151,9 @@ const ContentSchema = new Schema<IContentDocument>({
     required: true
   },
   landingPage: { type: LandingPageSchema, default: () => ({}) },
+  // Unpublished working copy. Absent until the admin first edits the landing
+  // page; Publish copies it onto `landingPage`.
+  landingPageDraft: { type: LandingPageSchema, default: undefined },
   metadata: {
     version: { type: String, default: '2.0.0' },
     lastModified: { type: String, default: () => new Date().toISOString() },
